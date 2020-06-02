@@ -6,6 +6,8 @@
 
 ​		富有经验的嵌入式固件工程师将会更好的做好准备来进入现有的技术文献进行深入研究，手机应用开发者将有一个更清晰的思维明白数据是如何在BLE设备中进行组织并与现有硬件进行交互。
 
+
+
 ## 这本书给谁
 
 此服务两类读者：
@@ -17,6 +19,8 @@
 *嵌入式工程师*
 
 ​		另一方面，此书也服务于那些考虑BLE用于产品设计的传统嵌入式工程师。如果你需要快速开始了解BLE可以做什么，这本书帮助你快速评估它对于你项目中作为一个无线协议的优缺点。
+
+
 
 ## 如何使用这本书
 
@@ -74,6 +78,8 @@
 
 ​		此章节介绍了的嵌入式设备工具需要编译代码来使用。使用第五章节讲述的ARM架构下，免费开放、基于开源GNU协议的工具链和跨平台编译的平台nRF51822-EK，你将创建开发一个心率监测仪演示在这颗芯片上。
 
+
+
 ## 使用代码范例
 
 本书附带内容（代码范例、练习等）可以在以下链接下载：[https://github.com/microbuilder/IntroToBLE](https://github.com/microbuilder/IntroToBLE).
@@ -81,6 +87,8 @@
 本书旨在帮助你完成你的工作。一般来说，如果本书提供了代码范例，你就可以在你的程序和文档中进行使用。你不必为请求版权而联系我们，除非你将代码发扬光大。比如，从本书范例的代码中摘取大块代码用于你自己的程序中是不需要询问版权的。售卖分销包含本书代码范例的CD-ROM就需要询问版权。应用本书代码范例询问问题是不需要询问版权。将本书范例的重要部分作为一部分放入你的产品文档是需要询问版权。我们喜欢，但是没有要求，标注引用。一个正常引用通常包括标题、作者、出版社和ISBN。例如：“Getting Started with Bluetooth Low Energy by Kevin Townsend, Carles Cufí, Akiba, and Robert Davidson (O’Reilly). Copyright 2014 Kevin Townsend, Carles Cufí, Akiba, and Robert Davidson, 978-1-491-94951-1.”
 
 如果你觉得以上范围都不包含你使用本书范例的场合，请联系我们：permissions@oreilly.com。
+
+
 
 ## 如何联系我们
 
@@ -102,3 +110,21 @@ Sebastopol, CA 95472
 Facebook: http://facebook.com/oreilly
 Twitter: http://twitter.com/oreillymedia
 YouTube: http://www.youtube.com/oreillymedia
+
+
+
+## 如何联系译者
+
+github 添加issue。
+
+mail: eronwuwu@gmail.com
+
+vx: 可通过本账号名，当然要变型下，如果你可以刚好修改对的话。
+
+
+
+## 译者注
+
+本书翻译在遇到专业名词上，尽量在中英文中做个权衡选择更有代表性的进行替换：如蓝牙低功耗就全书使用BLE替代；如Host则直接翻译主机不保留英文；如一些可能会带来歧义或者在技术交流中更经常使用英文的词组，则保留中英文，如时钟（timing）、连接（connections）。
+
+**文章持续翻译中，第一次因兴趣进行书籍翻译，若文章内容翻译不正确，恳请指点改正，感谢，并非常期待您的一同参与！**
