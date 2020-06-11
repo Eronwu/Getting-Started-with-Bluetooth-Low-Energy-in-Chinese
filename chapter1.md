@@ -258,7 +258,7 @@ BLE设备可以与外界进行通信的两个方法：*广播(broadcasting)*或�
 
 ​		功能性的“垂直切片（vertical slices）”覆盖了要么所有设备（GAP，GATT）所需要的操作基本模式，要么特殊的使用条例（[临近感应配置文件Proximity Profile](https://docs.microsoft.com/zh-cn/windows-hardware/drivers/bluetooth/bluetooth-proximity-profile)， 葡萄糖谱Glucose Profile），配置文件基本定义了协议应该如何使用去获取特别的目标，无论是通用的还是特定的。
 
-[第二章](#./chapter2.md)详细地涵盖了协议，但接下来的部分将快速的介绍配置文件以及对于应用开发者而言他们的意义是什么。
+[第二章](./chapter2.md)详细地涵盖了协议，但接下来的部分将快速的介绍配置文件以及对于应用开发者而言他们的意义是什么。
 
 ### 通用配置文件
 
