@@ -280,9 +280,9 @@ GAP（更多详尽讨论请见[第三章](#./chapter3.md)）和GATT（更多详�
 
 在写此书的这时候还没有非GATT的配置文件存在，但4.1版本中的L2CAP有向连接方式（L2CAP connection-oriented channels）可能意味着无GATT的配置文件（GATT-less profiles）将开始在不久后出现。
 
-#### SIG组织定义的GATT基础配置文件（GATT-based profiles）
+#### SIG组织定义的GATT基础配置文件
 
-蓝牙SIG组织为了BLE网络中的设备的顶层控制和数据层，超前地提出了一个可靠的参考框架。就像USB规格书一样，它也提供了一系列基于GATT的用例的配置文件的预定义，完全包含了需要实现广泛的特殊用例的所有流程和数据格式，包含以下内容：
+蓝牙SIG组织为了BLE网络中的设备的顶层控制和数据层，超前地提出了一个可靠的参考框架。就像USB规格书一样，它也提供了一系列基于GATT的用例的配置文件（GATT-based profiles）的预定义，完全包含了需要实现广泛的特殊用例的所有流程和数据格式，包含以下内容：
 
 *寻找我配置文件（Find Me Profile）*
 
