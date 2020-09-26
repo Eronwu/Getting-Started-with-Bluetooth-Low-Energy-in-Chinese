@@ -34,7 +34,7 @@ MCP也包括了一组C#库，被用于自动提供其任意的功能，允许应
 
 *图6-2. 主控制面板展示服务和特征数据*
 
-## PCA10000 USB Dongle 和 Wireshark
+## PCA10000 USB Dongle和Wireshark
 
 前文的主控制面板（Master Control Panel）似乎是与BLE从设备交互最简单的方式，但是一些用例需求访问BLE的底层数据。对于这些情况，诺迪克也提供给给PCA10000或者PCA10001一个通用的固件镜像和工具（这两个都包含在nRF51822-EK开发套件内），可以从一个单独的从设备嗅探通信数据并推送到[Wireshark](http://www.wireshark.org/)内。
 
@@ -46,4 +46,44 @@ Wireshark是一个成熟而功能强大的开源数据获取和分析的软件�
 
 如果你仅对设计与已有的BLE从设备通信的应用感兴趣，你将几乎不需要到达底下这一层。但是对于从事从设备设计、编码或者尝试调试一个制定的时延、吞吐量的硬件设计师或者固件工程师来说，这个就非常的实用。
 
-## CC2540 USB Dongle 和 SmartRF Sniffer
+## CC2540 USB Dongle和SmartRF Sniffer
+
+作为围绕CC254x芯片家族的开发生态系统的一部分，德州仪器设计了[CC2540EMK-USB](http://www.ti.com/tool/cc2540emk-usb)（图6-4），一个低成本的以CC2540芯片的USB dongle，可以使用它们免费的[SmartRF软件](http://www.ti.com/tool/packet-sniffer)（图6-5）来将开发板转换为一个BLE的嗅探器。这结合让你在最低等级上，可以看到你周围所有无线传输的BLE数据。
+
+![figure6-4](.\pic\figure6-4.png)
+
+*图6-4. CC2540EMK-USB*
+
+这完成了一个于PCA10000/Wireshark结合相似的功能（见前文）,但是其提供了一个不同的UI，更易于在一种特定的情境之下工作。该套件可能在一些地区更易于获取。
+
+## SmartRF-to-Wireshark Converter
+
+如果你更喜欢Wireshark（见前文[PCA10000 USB Dongle和Wireshark](PCA10000 USB Dongle和Wireshark))）作为数据分析工具，并且能够使用CC2540 USB dongle（见前文[CC2540 USB Dongle和SmartRF Sniffer](#CC2540 USB Dongle和SmartRF Sniffer)），你会很高兴发现[smartRFtoPcap](https://github.com/mikeryan/smartRFtoPcap)，这是一个免费的工具，可以将保存的SmartRF数据转换为一个Wireshark可以理解的文件格式。
+
+你不需要使用PCA10000和诺迪克的Wireshark插件将在线数据流导入Wireshark，而是可以选择转化之前获取的可能依然有用的文件，因为Wireshark包含了大量的过滤、搜索你记录的数据的工具。
+
+![figure6-5](.\pic\figure6-5.png)
+
+*图6-5. 德州仪器的SmartRF Sniffer应用*
+
+## Bluez hcitool和gatttool
+
+如果你正在使用一个Linux工作站，你可以利用Bluez蓝牙协议栈中的两个有用的工具：hcitool和gattool，这可以从命令行与BLE设备进行交互。
+
+![bird](.\pic\figure-bird.png) *如果你不能使用一个专业的Linux工作站，Bluez也可以很好地运行在一个不昂贵的Linux设备上，比如树莓派或者BeagleBone Black，这两都可以转变为非常有用且移动方便的BLE调试工具。*
+
+hcitool可以扫描、连接范围内的BLE从设备，或者视需要，使用任何可支持BLE4.0的USB dongle模拟为一个BLE设备。为了扫描范围内的BLE设备，你可以执行下列命令（假设我们的USB dongle已经作为hci0）：
+
+```shell
+sudo hcitool -i hci0 lescan
+```
+
+一旦你有了设备地址（通过之前扫描命令获取而得），你可以使用下列命令进行连接从设备（假设从设备的地址为6C:60:B3:6E:7C:B1）：
+
+```shell
+sudo hcitool lecc 6C:60:B3:6E:7C:B1
+```
+
+gatttool可以与GATT服务交互，如读写设备特征值。
+
+这些内容都可以使用命令行操作，意味着你可以将一些特定重复的动作或者测试条件写成脚本，并在多终硬件设备上可靠而持续地运行这些相同的测验。
