@@ -2,7 +2,7 @@
 
 本章介绍了用于BLE的一些有用的调试和开发工具。这包含了硬件工具，如无线协议分析工具（wireless protocol analyzers）或者*嗅探器*（sniffers，嗅探空中的传输数据，将获取到的数据现实在一个UI上并之后进行分析），还有在调试期间与BLE从设备直接交互的工具。
 
-## PCA10000 USB Dongle 和 Master Control Panel
+## PCA10000 USB Dongle和Master Control Panel
 
 PCA10000是一个USB电子狗，是诺迪克半导体的nRF51822-EK套件的一部分（参见第五章[用nRF51822-EK工作](./chapter5.md#用nRF51822-EK工作)），这个是nRF51822片上系统（SoC）的一个低成本评估套件。当这个套件被正在设计自有的BLE从设备的嵌入式硬件工程师设计时，即使你只开发手机应用，购买该套件也会比较划算，因为套件包含了许多非常有用和价格合理的调试工具。
 

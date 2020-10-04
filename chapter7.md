@@ -37,5 +37,35 @@ SensorTag通过提供一套相当便宜而易组装的传感器套件来解决�
 
 更多细节，或者购买设备，请访问TI的[SensorTag产品页面](http://www.ti.com/tool/cc2541dk-sensor)。
 
-## iOS的LightBlue
+## iOS端的LightBlue
+
+许多手机应用开发者可能对设计他们自有的BLE硬件没有兴趣，但是相反希望与市面上已存在的BLE从设备进行通讯。
+
+当[第六章](./chapter6.md)讨论的调试工具对应用设计师不再有效时，任何使用最新iOS设备的人都可以使用一个被称为LightBlue的非常好用的工具。这个免费的在[苹果应用市场上线](http://bit.ly/1hq3m9j)应用，可以用于逆向工程或者甚至模拟iPhone、iPad的任意BLE从设备。
+
+你可以使用LightBlue去与一个设备发现的服务和特征交互，如读写自有数值。你也可以使用它去获取一个已存在的BLE从设备的唯一签名，之后将该签名用于开发目的，根本上模仿一个你可能无法天天使用的设备。
+
+如果你知道设备应该长什么样，但是实际硬件却无法使用，你也可以创建一个配置文件去模拟你的从设备，并且创建一个看起来完全一样的设备，如图7-2展示。
+
+一个给OS X的LightBlue的版本在苹果应用市场已经可以使用，虽然此时iOS的版本提供更多功能。
+
+当开发一个BLE从设备时，应用开发者也可以使用LightBlue在iOS或者Android应用的副本完成之后。你可以在中心设备和从设备间模拟无线通讯，让你无需研发一个在中心设备使用的通用应用来调试从设备固件。
+
+![figure7-2](.\pic\figure7-2.png)
+
+*图7-2. LightBlue展示了一个模拟在另一个LightBlue上的BLE设备*
+
+## 安卓端nRF主控制面板
+
+如果你在一个设备上正运行支持BLE的Android4.3或者更高的版本的Android，诺迪克的主控制面板（Nordic's Master Control Panel）可以进行调试、逆向工程，或者与已存在BLE硬件在易操作的UI上面进行交互。
+
+你可以从[谷歌Play Store](http://bit.ly/1n13gYS)进行下载这个免费的工具，并寻找任意出现在附近的BLE从设备的服务和特征的UUID，订阅由特征发送的通知，或者写回数值到从设备，像LightBlue（参见前文[iOS端的LightBlue](#iOS端的LightBlue)）和PC端的主控制面板（参见第六章[PCA10000 USB Dongle 和 Master Control Panel](./chapter6.md#PCA10000-USB-Dongle和Master-Control-Panel)）一样的方式工作。
+
+图7-3展示了一个心跳监控器服务的结果，该服务的身体传感器位置和心率检测数据都可见。
+
+![figure7-3](.\pic\figure7-3.png)
+
+*图7-3. nRF主控制面板展示了一个心率监控器服务*
+
+更多关于主控制面板应用和其他来自诺迪克半导体的Android应用都可以在[支持页面](http://bit.ly/1kQGE9s)查看。
 
