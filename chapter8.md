@@ -111,10 +111,94 @@ BleWrapper是由蓝牙SIG组织发布的应用加速器库的主要部分。这�
 public class MainActivity extends Activity {
     // add this line to instantiate the BLE wrapper
     private BleWrapper mBleWrapper = null;
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 	}
 ```
+
+文件中增加的这行为创建BleWrapper类的实例，这包含了你将用于访问底层安卓BLE库的方法。在指导手册中，你还需增加一些回调函数（callback），这是来自安卓BLE库内的一些处理事件。
+
+在之前的代码段中，可以注意到自动生成的一个函数叫做onCreate()。当应用初始启动时该函数被调用，你将在开始阶段使用该函数进行一些初始化，有且只执行一次。这函数包含的是，如果设备进入睡眠或者context丢失之后再重新返回的情况下，不需要再重新初始化的内容。
+
+安卓的文献中都由概括出“activity生命周期”的概念，描述了应用在其自身“生命”过程中不同的阶段的方法。如当应用开启时，三个独立的生命周期方法将被调用：onCreate(), onStart(), 和onResume()。当仅需要初始化一次就初始化应用onCreate()的类，当设备进入睡眠或者context丢失的情况下需要重新初始化则初始化onResume()的类。
+
+文献中提供了在这个activity生命周期内更多的信息，这是需要理解的很重要的概念，因为你将初始例行程序的一部分做在onCreate()里面，一部分做在onResume()里面。当关机时你也将需要处理一些收尾部分，这将在onPause()或者onStop()完成。
+
+在onCreate()方法里面，你将看到部分由项目向导（project wizard）生成的样板（boilerplate）代码。在这之后，你将增加更多的代码去初始化你的mBleWrapper对象以及完成其他初始任务：
+
+```java
+@Override
+protected void onCreate(Bundle savedInstanceState)
+{
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_main);
+    
+    mBleWrapper = new BleWrapper(this, new BleWrapperUiCallbacks.Null()
+    {
+    });
+    
+    if (mBleWrapper.checkBleHardwareAvailable() == false)
+    {
+        Toast.makeText(this, "No BLE-compatible hardware detected",
+        Toast.LENGTH_SHORT).show();
+        finish();
+    }
+}
+```
+
+这部分代码通过将其实例化并调用自身构造函数（constructor），分配了一个新BleWrapper对象到mBleWrapper成员变量中（上一段为空）。当进行该封装器(wrapper)的实例化时，你还需要增加一个BLE回调函数作为该构造函数的一个参数。这里就是增加处理一些来自BLE协议栈的通知事件代码的地方。
+
+在软件编程中，*回调函数（callback）*作为一个可执行代码的引用，作为一个参数被传入函数中，当函数完成执行完毕之后将回调这段代码。对于现在，我们对这个构造函数不增加任何回调，之后再回来看这部分。
+
+在完成构造函数之后，代码执行一个检查，确认BLE硬件是否在这个系统上可用。如果为否，一个称为“Toast”的弹出信息框会提示用户缺失BLE硬件，并关闭app。
+
+这里就完成了应用启动时需要在onCreate()方法内执行的代码。现在看onResume()方法，该方法在应用启动以及应用在任何时候从睡眠中恢复时执行代码：
+
+```java
+@Override
+protected void onResume() {
+    super.onResume();
+    
+	// check for Bluetooth enabled on each resume
+    if (mBleWrapper.isBtEnabled() == false)
+    {
+        // Bluetooth is not enabled. Request to user to turn it on
+        Intent enableBtIntent = new Intent(BluetoothAdapter.
+        ACTION_REQUEST_ENABLE);
+        startActivity(enableBtIntent);
+        finish();
+    }
+    
+    // init ble wrapper
+    mBleWrapper.initialize();
+    }
+}
+```
+
+![figure-bird](.\pic\figure-bird.png) *Eclipse提供一个快速建立这些函数的捷径。只需要敲方法名字的一开头部分的几个字母，之后按Ctrl+Spacebar。从弹出的自动完成列表中选择函数，让Eclipse为你建造函数。*
+
+这里的样板代码为super.onResume()。你需要在这后边加入自有代码。在这个案例中，你需要检查蓝牙在每一次从一个不同的context或者睡眠中恢复后，是否是可以用的。当其他程序使用在用时，蓝牙可能已经被关闭了。不去捕获状态改变仅仅假设蓝牙一直时开启的，这将会最终导致一些故障发生，或者软件的异常。为处理这种状况，如果程序发现蓝牙是关闭的，就将使用Android intent发送给用户一个请求，去打开蓝牙并退出应用。下一次应用重新打开的时候，如果蓝牙是开启的，程序就将继续进行。
+
+一旦代码通过前面的检查，就将开始初始化BleWrapper，这将打开蓝牙界面并从安卓蓝牙适配器（Android Bluetooth adapter）内获取一个实例。一旦你得到该实例，你就可以访问BLE无线模块和协议的函数。
+
+最后，你需要处理安卓生命周期的最后一个方法，onPause()。在任何context丢失、设备进入睡眠状态、或者应用关闭的时候，该方法都被调用：
+
+```java
+@Override
+protected void onPause() {
+    super.onPause();
+    
+    mBleWrapper.diconnect();
+    mBleWrapper.close();
+}
+```
+
+在我们的范例中，安卓设备将作为一个GAP中心设备和一个GATT客户端，并且SensorTag设备将会作为一个GAP从设备和一个GATT服务端（参见第三章[角色](./chapter3.md#角色)和第四章[角色](./chapter4.md#角色)）。
+
+还是一样，样板代码保持在顶部。在这之后，程序调用两个封装器的方法。第一个方法让你去与远端设备“断开连接”。这个实际上是与远端从设备断开连接，并执行uiDeviceDisconnected()的回调方法。如果你需要在与从设备断开连接之后处理一些事情，你需要复写uiDeviceDisconnected()回调函数。最后，关闭BleWrapper，即完全关闭本地GATT客户端和中心设备。
+
+## 连接到远端设备
 
