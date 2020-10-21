@@ -202,3 +202,145 @@ protected void onPause() {
 
 ## 连接到远端设备
 
+现在初始化和结束清除都已经完成，可以关注到代码真正的部分了。与你需要控制的BLE的主要任务就是扫描和连接远端设备、通信和执行任何必要的管理或者安全任务。
+
+当初始化一个扫描过程（参见第二章[广播和扫描](./chapter2.md#广播和扫描)），你可以让BLE库知道，你希望被通知到任何其从远端设备接收到的广播包。无论何时设备被找寻到，BleWrapper都会带着该设备信息去调用uiDeviceFound()回调函数。你可以使用设备信息来决定是否连接该设备。
+
+对于扫描，你需要创建两个按键：第一个开启扫描，第二个停止。要创建这个按键，你需要到项目 /res/menu 目录中并编辑main.xml文件。如果你双击该文件，Eclipse会用GUI界面来引导你使用去增加菜单项。任何在main.xml文件的菜单项都将作为一个按键在选项菜单中存在。你将创建两个项，一个称为开始，一个称为结束，各自用于开始和结束扫描。
+
+在安卓菜单GUI中，选择增加→项目，并使用“扫描动作”（action_scan）和“扫描结束”（ac
+tion_stop）作为名字，如图8-7。这将作为按键的ID，当你为菜单按键写入点击处理的时候，你可以使用该ID。在菜单项的标题区域，各自敲击扫描（Scan）和停止（Stop），以在菜单项上显示文字。
+
+![figure8-7](.\pic\figure8-7.png)
+
+*图8-7. 在安卓ADT菜单中增加按键*
+
+一旦菜单项创建，你将需要处理按键点击事件。默认下，安卓样例代码会使用在*main.xml*中的内容作为菜单按键。样例代码没有点击处理，因此你需要增加进来。
+
+在Eclipse中，如果敲击onOptionsItemSelected并按下Ctrl+Spacebar，软件回自动填充该函数，包含了@Override的关键字。这将为点击事件实现自有的处理而复写onOptionsItemSelected()函数。当点击菜单栏的任何项，onOptionsItemSelected()方法都将被调用。一旦你进入该方法，你需要有一个switch声明用于处理哪一个菜单项被点击的事件。虚拟代码看起来如下：
+
+```java
+@Override
+public boolean onOptionsItemSelected(MenuItem item) {
+switch (item.getItemId())
+{
+    case R.id.action_scan:
+        mBleWrapper.startScanning();
+    	break;
+    case R.id.action_stop:
+    	mBleWrapper.stopScanning();
+    	break;
+    default:
+    	break;
+    }
+    return super.onOptionsItemSelected(item);
+}
+```
+
+该代码覆写了OptionsItemSelected()函数以使用自有的处理。该方法仅在处理关于选项菜单的时候方才调用。在switch声明中，可以根据被点击的按键选项ID来决定进入哪一个处理。该项ID基于之前你创建的按键的ID。R.id这个前缀意味着来自内部安卓项目资源目录的ID，并不是安卓自身命名空间的一部分。
+
+在新的处理的两个动作中，获将开启扫描流程，或将停止，正如你在BleWrapper中看到的两个方法一样。实际上，开启和停止扫描流程可能是整个按键功能中最简单的一个部分。
+
+下一个步骤是当远端设备被检测到的动作。远端设备将发出“它在这儿”和“准备连接”的广播。当程序进入扫描模式，其将在BLE无线模块中开启扫描，并让安卓系统知道如果接受到广播其希望被通知到。安卓蓝牙库将通过回调函数通知程序。
+
+为了使用回调函数，你需要重新看下在onCreate()方法内写的代码。在该方法内，你初始化了BleWrapper.。在BleWrapper.的构建函数内，其希望你提供一列回调函数。之前在这边留空了，但是现在需要填充该部分内容。首先要覆写uiDeviceFound()回调函数，这函数将在设备在扫描过程中被发现的时候被调用：
+
+``` java
+mBleWrapper = new BleWrapper(this, new BleWrapperUiCallbacks.Null()
+{
+    @Override
+    public void uiDeviceFound(final BluetoothDevice device,
+    final int rssi,
+    final byte[] record
+    )
+    {
+        String msg = "uiDeviceFound: "+device.getName()+", "+rssi+",
+        "+rssi.toString();
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+        Log.d("DEBUG", "uiDeviceFound: " + msg);
+    }
+}
+```
+
+当发现一个设备的时候，这段代码将弹出一个toast消息窗。这并没有什么有效，但是是最简单的一种方式，当设备被发现并显示关于设备的信息。在真实用户使用中，你将输出任何设备的信息到设备列表中，这样用户就可以点击去初始化一个连接。
+
+toast弹出信息显示两个来自广播包的内容：设备名字（参见第三章[广播数据格式](./chapter3.md#广播数据格式)）和RSSI。RSSI（代表*信号强度指标* 的一个无线术语）是表示接收的信号（在这情况下为，在广播包内所有比特的平均值）有多强。在一些情况下，RSSI可以用作提供一个大致的距离数据。另一条重要的有用的信息大概就是设备地址（这个在每一个广播包内都包含），但目前单独设备名字也足够了。
+
+代码不仅在toast消息窗输出相同的信息，也通过Log命令输出日志信息，Log时一个安卓库。在Eclipse IDE使用logcat工具调试中，Log信息会进行显示（见图8-8）。当你使用Log命令，你可以指定一个标签（tag）。使用这个很棒的工具，你可以用标签过滤掉大量的信息。
+
+![figure8-8](.\pic\figure8-8.png)
+
+*图8-8. 来自Log命令的消息在完整的logcat堆放的信息高亮显示*
+
+目前，代码应该有能力去验证检测一个远端设备发送广播包。一旦有能力做这些事情，就有能力去连接。通常，应该要保存所有检测到的设备并以列表的形式显示给用户，如第三章[连接建立流程](./chapter3.md#连接建立流程)。用户就可以点击他试图连接的设备。为了避免GUI的复杂性，我们通过做假设来简化用例。
+
+我们假设希望连接到一个SensorTag设备。以下代码使用“SensorTag”检测广播包，并用自动初始化任何用这名字的设备：
+
+``` java
+@Override
+public void uiDeviceFound(final BluetoothDevice device,
+final int rssi,
+final byte[] record)
+{
+    String msg = "uiDeviceFound: "+device.getName()+", "+rssi+", "+ \
+    rssi.toString();
+    Log.d("DEBUG", "uiDeviceFound: " + msg);
+    if (device.getName().equals("SensorTag") == true)
+    {
+        bool status;
+        status = mBleWrapper.connect(device.getAddress().toString());
+        if (status == false)
+        {
+        	Log.d("DEBUG", "uiDeviceFound: Connection problem");
+        }
+    }
+}
+```
+
+自动连接进程避免进入安卓复杂的GUI，只关注在我们从事的BLE库上面。
+
+之前给uiDeviceFound()的回调函数代码已经去掉了弹出消息框。在找到一个和“SensorTag”名字相同的设备之后，代码回让BleWrapper连接设备，并以字符串格式传入设备地址（在第二章[蓝牙设备地址](./chapter2.md#蓝牙设备地址)介绍）。BleWrapper回使用地址向设备发送一个单播连接请求。接着当连接成功后，会通过uiDeviceConnected()回调函数进行提示。
+
+你将需要覆写回调函数，增加处理代码。如果连接因为某种原因失败，该方法会返回失败。你可以使用logcat控制台去进行日志记录来进行调试。
+
+## 与远端设备进行通信
+
+一旦你成功连接一个远端设备，BleWrapper将自动为新的设备开启发现服务（如第四章[服务与特征发现](./chapter4.md#服务与特征发现)描述）。这意味着BleWrapper将要求新的设备列出所有的服务和特征，并保存在列表中。
+
+如果连接到GATT服务端和服务发现成功了，其他回调函数就开始了。这回，uiAvailableServices()的回调函数和其中一个列出所有的蓝牙GATT服务的服务列表（service list）（更多关于服务和特征信息请参见第四章[服务](./chapter4.md#服务)）这个参数在远端设备就可以使用了。为了与设备进行通信，我们需要进入服务以及在服务内的特征。
+
+这时候，可以循环列表并将所有的服务打印出来，但是这是不易读的格式。服务通过128bitUUID列出（参见第四章[UUID](./chapter4.md#UUID)）。早期时候从蓝牙应用加速器妇之的库包含了一个称为BleNamesResolver的类。这个类有很多方法可以将UUID解析为BLE的名字。其可以解析包括服务和特征的名字，因此这个库是相当有用的。
+
+已知的UUID列表位域BleDefinedUUIDs.java文件中，你之后需要增加一些合适的服务的UUID进该列表中。目前，仅遍历该服务列表并打印出所有的服务UUID，就可以转化出可读的名字和相关信息（对于目前logcat来说）。下面代码是另一个覆写的回调函数，并在onCreate方法中走到，并在mBleWrapper的构造函数中：
+
+``` java
+@Override
+public void uiAvailableServices(BluetoothGatt gatt,
+BluetoothDevice device,
+List<BluetoothGattService> services
+)
+{
+    for (BluetoothGattService service : services)
+    {
+        String serviceName = BleNamesResolver.resolveUuid
+        (service.getUuid().\toString());
+        Log.d("DEBUG", serviceName);
+    }
+}
+```
+
+该代码遍历了每一个服务列表中的元素。对于每一个服务，其将UUID转换为一个字符串值并传给BleNamesResolverBleNamesResolver.resolveUuid()方法。该方法查找已知的UUID列表，当找到一个匹配的UUID，就返回相关的可读的UUID名字。代码将通过logcat打印出名字到Eclipse IDE中。正如图8-9所示。这也可以导出信息到文本框中，但是这就稍微麻烦了点。
+
+![figure8-9](.\pic\figure8-9.png)
+
+*图8-9. Eclipse中，logcat显示了服务和特征*
+
+可以看到，有一些UUID是未知的。这通常意味着含有厂家指定的128bit UUID，如果需要解析清楚，就需要将其加入UUID列表中。在这个例子中，TI给自己的设备使用一些厂家指定的服务UUID，因为这部分不需要适配到一个标准的设备配置文件中。这是一个很大的UUID地址空间，因此在处理不同BLE地址时候，可能会遇到很多厂家指定的UUID。你需要增加TI厂家制定UUID到列表中并重新运行这段程序。
+
+目前，你走完BLE应用的大部分开发过程，并可以运行。你已经检测了远端设备，连接并打印了其可用的所有服务。下一步是读取关联设备传感器的特征值（在第四章[特征](./chapter4.md#特征)介绍）。
+
+属于传感器的特征值携带了传感器的数据，因此通过读取可获得传感器数据。一旦从传感器获取了数据，你可以进行整理并处理这些数据，并用吸引人的方式来显示给用户。在这例子中，我们将关注于获取数据，并让用户决定如何处理、展示。
+
+当使用SensorTag时候有一个需要注意的是这是一个移动设备。设备被设计为低功耗，因此传感器默认是关闭的。为了读取每一个传感器，你需要写入特征值去开启。一旦传感器可以使用，你就可以读取数据。
+
+正如第四章[特征](./chapter4.md#特征)讨论的，所有与用户数据相关联的操作都通过特征执行。为了开启一个传感器，首先要找到包含相符合的特征的服务和其特征（参见第四章[服务和特征发现](./chapter4.md#服务和特征发现)），然后接收其数值（参见第四章[读取特征和描述符](./chapter4.md#读取特征和描述符)）。接着你需要修改特征值以开启传感器，并用合理的方式写入到设备，这参见第四章[写入特征和描述符](./chapter4.md#写入特征和描述符)。这称作一个*读取-修改-写入*流程。
