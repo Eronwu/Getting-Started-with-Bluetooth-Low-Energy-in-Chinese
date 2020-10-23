@@ -222,16 +222,16 @@ tion_stop）作为名字，如图8-7。这将作为按键的ID，当你为菜单
 ```java
 @Override
 public boolean onOptionsItemSelected(MenuItem item) {
-switch (item.getItemId())
-{
-    case R.id.action_scan:
-        mBleWrapper.startScanning();
-    	break;
-    case R.id.action_stop:
-    	mBleWrapper.stopScanning();
-    	break;
-    default:
-    	break;
+    switch (item.getItemId())
+    {
+        case R.id.action_scan:
+            mBleWrapper.startScanning();
+            break;
+        case R.id.action_stop:
+            mBleWrapper.stopScanning();
+            break;
+        default:
+            break;
     }
     return super.onOptionsItemSelected(item);
 }
@@ -279,8 +279,8 @@ toast弹出信息显示两个来自广播包的内容：设备名字（参见第
 ``` java
 @Override
 public void uiDeviceFound(final BluetoothDevice device,
-final int rssi,
-final byte[] record)
+                            final int rssi,
+                            final byte[] record)
 {
     String msg = "uiDeviceFound: "+device.getName()+", "+rssi+", "+ \
     rssi.toString();
@@ -316,9 +316,8 @@ final byte[] record)
 ``` java
 @Override
 public void uiAvailableServices(BluetoothGatt gatt,
-BluetoothDevice device,
-List<BluetoothGattService> services
-)
+                                BluetoothDevice device,
+                                List<BluetoothGattService> services)
 {
     for (BluetoothGattService service : services)
     {
@@ -344,3 +343,280 @@ List<BluetoothGattService> services
 当使用SensorTag时候有一个需要注意的是这是一个移动设备。设备被设计为低功耗，因此传感器默认是关闭的。为了读取每一个传感器，你需要写入特征值去开启。一旦传感器可以使用，你就可以读取数据。
 
 正如第四章[特征](./chapter4.md#特征)讨论的，所有与用户数据相关联的操作都通过特征执行。为了开启一个传感器，首先要找到包含相符合的特征的服务和其特征（参见第四章[服务和特征发现](./chapter4.md#服务和特征发现)），然后接收其数值（参见第四章[读取特征和描述符](./chapter4.md#读取特征和描述符)）。接着你需要修改特征值以开启传感器，并用合理的方式写入到设备，这参见第四章[写入特征和描述符](./chapter4.md#写入特征和描述符)。这称作一个*读取-修改-写入*流程。
+
+现在已经连接了外围设备，并有BluetoothGatt对象可以使用。为了获得服务，你需要使用gatt对象内的一个叫做getService()的方法。这个带有一个UUID的参数，这意味着你将要提供一个指定的服务UUID。这些事所有TI指定的UUID，但是幸运的是，TI在SensorTag源码中以Java格式提供了完整的服务列表和特征的UUID。
+
+你可以复制粘贴完整的UUID列表到你的源代码中，并让其称为常量。以下为一个这应该展现的样子的例子：
+
+``` java
+private static final UUID
+    UUID_IRT_SERV = fromString("f000aa00-0451-4000-b000-000000000000"),
+    UUID_IRT_DATA = fromString("f000aa01-0451-4000-b000-000000000000"),
+    UUID_IRT_CONF = fromString("f000aa02-0451-4000-b000-000000000000"),
+    UUID_ACC_SERV = fromString("f000aa10-0451-4000-b000-000000000000"),
+    UUID_ACC_DATA = fromString("f000aa11-0451-4000-b000-000000000000"),
+    UUID_ACC_CONF = fromString("f000aa12-0451-4000-b000-000000000000"),
+    UUID_ACC_PERI = fromString("f000aa13-0451-4000-b000-000000000000");
+...
+```
+
+服务UUID有SERV的后缀。否则其他的UUID就是特征。一旦你有了这个定义，你可以写入代码去访问指定的传感器服务和特征。
+
+与远端设备通信不像读取一个特征以及有一个方法返回值那样简单。你实际是需要发送给设备ATT读写请求，GATT服务端接着会回应请求（更近一步概念请见第二章[ATT操作](./chpater2.md#ATT操作)）。在同一时间仅有一个请求会被处理，此时其他接收的请求将被静默丢弃。这看起来似乎很糟糕，因为似乎像设备没有回应。
+
+正确的操作顺序是发送一个请求，并等待对应的回调函数。你将发送一个读请求到远端设备去读取一个指定的特征。在设备回应之后，BleWrapper将带着特征信息发出一个回调函数给uiNewValueForCharacteristic。通过如此，你可以执行*读取特征值* 的GATT特征，详细在第四章[读取特征和描述符](./chapter4.md#读取特征和描述符)提到。
+
+下面这段代码请求了读取一个加速度传感器的配置特征：
+
+``` java
+BluetoothGatt gatt;
+BluetoothGattCharacteristic c;
+gatt = mBleWrapper.getGatt();
+c = gatt.getService(UUID_ACC_SERV).getCharacteristic(UUID_ACC_CONF);
+mBleWrapper.requestCharacteristicValue(c);
+```
+
+一旦请求发出，设备就会带着特征数据回应。在这个例子中，你将导出特征原始数据的每一个字节到logcat中：
+
+``` java
+@Override
+public void uiNewValueForCharacteristic(BluetoothGatt gatt,
+                                        BluetoothDevice device,
+                                        BluetoothGattService service,
+                                        BluetoothGattCharacteristic ch,
+                                        String strValue,
+                                        int intValue,
+                                        byte[] rawValue,
+                                        String timestamp)
+{
+    super.uiNewValueForCharacteristic( gatt, device, service,
+    ch, strValue, intValue,
+    rawValue, timestamp);
+    Log.d(LOGTAG, "uiNewValueForCharacteristic");
+    for (byte b:rawValue)
+    {
+    	Log.d(LOGTAG, "Val: " + b);
+    }
+}
+```
+
+很重要一点是，读、写都必须进行请求。在安卓BLE库中有很多函数可以得到和设置特征值。这些操作仅在本地保存的数值上，不能再远端设备。在大多情况下，任何与远端设备交互都将需要使用回调函数。
+
+在你读取传感器的任何数值之前，你先要开启传感器。因此你先要写入配置特征值（传感器都有自有的特征来开启，不要与CCCD相混淆）。在大多数情况下，你可以写入0x01到特征中开启。如之前提到的，你实际发送一个写请求（*写入特征值* 请见第四章[写入特征和描述符](./chapter4.md#写入特征和描述符)，操作列表在第二章[ATT操作](./chapter2.md#ATT操作)）给端设备，并等待回调函数。
+
+下面这段代码通过在远端设备写入0x01到加速度传感器配置特征中，开启了加速度传感器：
+
+``` java
+BluetoothGattCharacteristic c;
+c = gatt.getService(UUID_ACC_SERV).getCharacteristic(UUID_ACC_CONF);
+mBleWrapper.writeDataToCharacteristic(c, new byte[] {0x01});
+mState = ACC_ENABLE; // keep state context for callback
+```
+
+如之前一样，你需要等待回调函数来确认是否写入操作成功。对于代码在哪里等待这个事情发生的问题，最好就是使用单独一个现成或者一个状态机来确定。一个单独的线程可以在线程阻塞时等待回调函数而不需要耽搁系统继续运行。状态机则可以在相同的线程中维持，并保持跟踪当前的context以执行操作。
+
+对于一个写操作，应用加速器已经有两个很有用的回调函数：
+
+``` java
+@Override
+public void uiSuccessfulWrite( BluetoothGatt gatt,
+                                BluetoothDevice device,
+                                BluetoothGattService service,
+                                BluetoothGattCharacteristic ch,
+                                String description)
+{
+    BluetoothGattCharacteristic c;
+    super.uiSuccessfulWrite(gatt, device, service, ch, description);
+    switch (mState)
+    {
+        case ACC_ENABLE:
+        Log.d(LOGTAG, "uiSuccessfulWrite: Successfully enabled accelerometer");
+        break;
+    }
+}
+      
+@Override
+public void uiFailedWrite( BluetoothGatt gatt,
+                            BluetoothDevice device,
+                            BluetoothGattService service,
+                            BluetoothGattCharacteristic ch,
+                            String description)
+{
+	super.uiFailedWrite(gatt, device, service, ch, description);
+    switch (mState)
+    {
+        case ACC_ENABLE:
+        Log.d(LOGTAG, "uiFailedWrite: Failed to enable accelerometer");
+        break;
+    }
+}
+```
+
+为了开启所有的传感器，你可以直接拓展这个例子来开启所有的传感器。在执行写入操作开启第一个传感器后，你可以开启在回调函数中其他的传感器：
+
+``` java
+@Override
+public void uiSuccessfulWrite( BluetoothGatt gatt,
+                                BluetoothDevice device,
+                                BluetoothGattService service,
+                                BluetoothGattCharacteristic ch,
+                                String description)
+{
+    BluetoothGattCharacteristic c;
+    super.uiSuccessfulWrite(gatt, device, service, ch, description);
+    switch (mState)
+    {
+        case ACC_ENABLE:
+        Log.d(LOGTAG, "uiSuccessfulWrite: Successfully enabled accelerometer");
+
+        // enable next sensor
+        c = gatt.getService(UUID_IRT_SERV).getCharacteristic(UUID_IRT_CONF);
+        mBleWrapper.writeDataToCharacteristic(c, new byte[] {0x01});
+        mState = IRT_ENABLE; // keep state context for callback
+        break;
+            
+        case IRT_ENABLE:
+        Log.d(LOGTAG, "uiSuccessfulWrite: Successfully enabled IR temp sensor");
+        // enable next sensor
+        c = gatt.getService(UUID_HUM_SERV).getCharacteristic(UUID_HUM_CONF);
+        mBleWrapper.writeDataToCharacteristic(c, new byte[] {0x01});
+        mState = HUM_ENABLE; // keep state context for callback
+        break;
+
+        case HUM_ENABLE:
+        ....
+        mState = MAG_ENABLE;
+        break;
+        ...
+    }
+}
+```
+
+一旦传感器开启后，就可以读取传感器。手动读取，你将发送一个读请求到你想要读取的特征中，并在回调函数中进行等待（参见第二章[ATT操作](./chpater2.md#ATT操作)和第四章[读取特征和描述符](./chapter4.md#读取特征和描述符)）。读取可以由一个事件发动，如按键或者一个时钟轮询传感器。在这个例子中，在选项菜单的一个测试按键发动事件。按键的onClick方法调用以下函数来产生一个读请求：
+
+``` java
+// Start the read request
+private void testButton()
+{
+    BluetoothGatt gatt;
+    BluetoothGattCharacteristic c;
+    if (!mBleWrapper.isConnected()) {
+        return;
+    }
+    
+    Log.d(LOGTAG, "testButton: Reading acc");
+    gatt = mBleWrapper.getGatt();
+    c = gatt.getService(UUID_ACC_SERV).getCharacteristic(UUID_ACC_DATA);
+    mBleWrapper.requestCharacteristicValue(c);
+    mState = ACC_READ;
+}
+
+// Get the read response inside this callback
+@Override
+public void uiNewValueForCharacteristic(BluetoothGatt gatt,
+                                        BluetoothDevice device,
+                                        BluetoothGattService service,
+                                        BluetoothGattCharacteristic ch,
+                                        String strValue,
+                                        int intValue,
+                                        byte[] rawValue,
+                                        String timestamp)
+{
+    super.uiNewValueForCharacteristic( gatt, device, service,
+                                        ch, strValue, intValue,
+                                        rawValue, timestamp);
+    
+    // decode current read operation
+    switch (mState)
+    {
+        case (ACC_READ):
+        Log.d(LOGTAG, "uiNewValueForCharacteristic: Accelerometer data:");
+        break;
+    }
+    
+    // dump data byte array
+    for (byte b:rawValue)
+    {
+    	Log.d(LOGTAG, "Val: " + b);
+    }
+}
+```
+
+一旦传感器数据被请求，就需要进行一系列步骤来处理数据。数据处理每一个传感器的代码可以在SensorTag安卓库的例子中或者在[SensorTag在线使用指南](http://bit.ly/1kQHyTq)找到。
+
+你可以复制/粘贴加速度传感器的处理算法到之前代码段中，通常在代码的ACC_READ状态部分。其他传感器也是如此。
+
+轮询远端传感器是周期获取数据的一种方式，但却对于两端设备都不是节能的。远端设备需要持续保持接收读请求，手机需要保持唤醒去发送轮询请求。一个更节能的方式就是用设备发送通知取代（在第四章[服务初始化更新](./chapter4.md#服务初始化更新)详细描述）。你可以手动设置一些传感器通知的周期。
+
+应用加速器有一个专门的方法来开启通知。在安卓上开启通知，你通常要为你感兴趣的特定特征开启局部通知。
+
+一旦完成这事，你还需要通过写入设备的客户端特征配置描述符（CCCD）在开启远端设备开启通知，如第四章[客户端特征配置描述符](./chapter4.md#客户端特征配置描述符)描述）。幸运的是，这都已经被抽取了出来，两个操作过程都可以通过一个单独的方法调用来处理。
+
+当测试按键被按下，下面的代码即为加速度传感器开启了通知：
+
+``` java
+private void testButton()
+{
+    BluetoothGatt gatt;
+    BluetoothGattCharacteristic c;
+    if (!mBleWrapper.isConnected()) {
+    	return;
+    }
+    
+    // set notification on characteristic
+    Log.d(LOGTAG, "Setting notification");
+    gatt = mBleWrapper.getGatt();
+    c = gatt.getService(UUID_IRT_SERV).getCharacteristic(UUID_IRT_DATA);
+    mBleWrapper.setNotificationForCharacteristic(c, true);
+    mState = ACC_NOTIFy_ENB;
+}
+```
+
+有一点要注意的是，这里没有执行onDescriptorWrite()回调函数。去得知通知在远端设备被成功开启的时间的最可靠的方式，就是在CCCD已经被修改以及GATT服务器已经应答了写请求之后，去获取onDescriptorWrite()回调函数。这里的范例增加了onDescriptorWrite()回调函数到BleWrapper类中的应用加速器中执行，这里执行了BluetoothGattCallback代码：
+
+``` java
+/* callbacks called for any action on particular Ble Device */
+private final BluetoothGattCallback mBleCallback = new BluetoothGattCallback()
+{
+    ...
+        
+    // Added by Akiba
+    @Override
+    public void onDescriptorWrite( BluetoothGatt gatt,
+                                    BluetoothGattDescriptor descriptor,
+                                    int status)
+    {
+        String deviceName = gatt.getDevice().getName();
+        String serviceName = BleNamesResolver.resolveServiceName( \
+            descriptor.getCharacteristic().getService().getUuid().\
+            toString().toLowerCase(Locale.getDefault()));
+        String charName = BleNamesResolver.resolveCharacteristicName(\
+            descriptor.getCharacteristic().getUuid().toString().\
+            toLowerCase(Locale.getDefault()));
+        String description = "Device: " + deviceName + " Service: " \
+        	+ serviceName + " Characteristic: " + charName;
+        
+        // we got response regarding our request to write new value to
+        // the characteristic, let's see if it failed or not
+        if(status == BluetoothGatt.GATT_SUCCESS) {
+            mUiCallback.uiSuccessfulWrite( mBluetoothGatt, mBluetoothDevice,
+                                            mBluetoothSelectedService,
+                                            descriptor.getCharacteristic(),
+                                            description);
+        }
+        else {
+            mUiCallback.uiFailedWrite( mBluetoothGatt, mBluetoothDevice,
+                                        mBluetoothSelectedService,
+                                        descriptor.getCharacteristic(),
+                                        description + " STATUS = " + status);
+        }
+    };
+    ...
+}
+```
+
+如果通知被正确写入，onDescriptorWrite()方法将调用应用加速器的uiSuccessfulWrite()方法。
+
+你可以用你开启自身传感器一样的方式为所有的传感器特征开启通知，使用一个状态机来排成队列一一处理。对于通知，要始终知道对于安卓4.4（KitKat），只有4个特征可以在同一时间被开启。这是当前安卓BLE库的一个限制，尽管可能在未来的版本中被改变。
+
+本章的代码大多以片段方式呈现，你可以从本书[GitHub库](http://bit.ly/1qoj8Ed)中获取到完整的代码。
