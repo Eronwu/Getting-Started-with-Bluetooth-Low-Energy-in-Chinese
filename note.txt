@@ -7,3 +7,5 @@ resolve
 encounter
 遇到
 
+code example
+代码示例
