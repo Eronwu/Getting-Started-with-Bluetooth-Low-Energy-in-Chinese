@@ -306,3 +306,47 @@ iBeacon模型提供了一系列连接设备和基于位置进行通讯的可能�
 
 *范围(Ranging)*是一个运行在接收设备（比如iPhone）的iBeacon应用上的一个进程，根据接收来自附近的beacon的无线信号的强度来估算接收设备和beacon的距离。信号质量由RSSI（接收信号质量标识）测算，这是一个用dBm单位的数字，可以由iOS设备上的BLE应用发现的外围设备使用。特别是，RSSI跟踪每一个有运行iBeacon应用的iOS设备范围内的beacon。当iPhone在房间内移动的适合，从特定的beacon进行计算的RSSI就会改变。通常，当iPhone和iBeacon距离增加时，RSSI会变小。
 
+Beacon也在广播包内广播RSSI数值。在这个例子中，RSSI数值是固定的，在出厂中已经被写入beacon中。RSSI通常使用iPhone来运行指定的软件，以固定一米距离来计算beacon的信号强度决定数值。比如，Radius Networks的[iBeacon定位应用](http://bit.ly/1hq5BJS)就可以使用。
+
+RSSI数值实际被保存为一个有符号8bit的整形，在广播包中以dBm为单位，但你不需要知道这个，也不需要知道RSSI为一个对数的比例以及（通常）数值是以和beacon的距离的平方的倒数而变化使用，因为这些细节都已经由iOS进行处理了。因为在无线芯片的结构和性能的各自不同，导致需要校准来处理从一个beacon到另一个beacon信号输出不同的情况。
+
+iBeacon应用将测量的RSSI值与beacon发出的广播包内的一米的RSSI期望值作对比，来测算beacon和iOS设备的距离。如果所有的beacon都经过校准，这种方法声称可得到距离beacon相当准确的估算值（尤其是在一米距离内）。
+
+对于使用iBeacon测算范围，核心定位服务（Core Location service）提供了类和方法，如接下来的例子演示。你将使用CLBeaconRegion的实例类以及相关的方法。有了经过校准的beacon和CLBeaconRegion，你只需要考虑以米为单位的实际距离以及beacon范围（根据一个你设置的半径数值，围绕指定的iBeacon的一个圆形区域）。
+
+比如，你可以使用iBeacon应用法骑一些与一个iBreacon区域相关的动作，比如当你进入或者离开一个指定的beacon的期望半径内的区域时，一个通知就会提醒你。告诉应用哪一个iBeacon最近的方法也有提供，也是依据范围数值。
+
+### 实现一个iBeacon应用
+
+为了实现一个iBeacon应用，我们需要的是核心定位框架（Core Location framework），这个是一个包含CLLocationManager,CLBeaconRegion,以及CLBeacon应用关键的类。没有部分核心蓝牙框架可以直接使用。iPhone应用检测附近beacon的存在，以及确定哪一个beacon是最近的。
+
+为了测试应用，我们编写了几个BLE112模块（如图9-4所示），为了便于放置，由硬币单元的CR2032为供电。
+
+![figure9-4](.\pic\figure9-4.png)
+
+*图9-4. BLE112模组，编写为一个iBeacon，并且由CR2032硬币单元供电*
+
+![figure-bird](.\pic\figure-bird.png) *为了测试，Bluegiga BLE112模组产生并传送被要求的iBeacon广播包。已完成的包括iPhone应用和BLE112模组的测试应用的代码都已在[本书的GitHub目录](http://bit.ly/1qoj8Ed)提供。
+
+首先，你需要创建并注册beacon区域：
+
+``` c++
+@implementation BobsBeaconTracker
+- (instancetype)init
+{
+    self = [super init];
+    if (self == nil) return nil;
+    
+    self.locationManager = [[CLLocationManager alloc] init];
+    self.locationManager.delegate = self;
+    self.beaconRegion = [[CLBeaconRegion alloc]
+    initWithProximityUUID: [[NSUUID alloc]
+   						 initWithUUIDString:
+                            @"E2C56DB5-DFFB-48D2-B060-D0F5A71096E0"]
+                            identifier: @"Bobs Beacon default region"];
+    self.beaconRegion.notifyEntryStateOnDisplay = YES;
+    [self.locationManager startMonitoringForRegion:self.beaconRegion];
+    return self;
+}
+```
+
