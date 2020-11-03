@@ -350,3 +350,138 @@ iBeacon应用将测量的RSSI值与beacon发出的广播包内的一米的RSSI�
 }
 ```
 
+因为每一个iBeacon应用都必须使用一个指定的proximity UUID，这个先前通过initWithProximityUUID进程被硬编码入应用中，即应用就只会对有这个UUID的beacon回应（当应用下载时，UUID就被注册入iOS）。这意味着用户要控制，因为他们必须下载应用去使用（尽管一旦下载，应用就可以及时在没有打开或者运行的时候接收通知信息）。没有下载应用，用户将不会被不需要的iBeacon通知信息和关联其他有着不同proximity UUID的beacon的通知所轰炸。
+
+在iOS7.1上，在应用安装后，操作系统自身会注册该应用工作的beacon区域。之后，及时应用被挂起或者没有运行，系统都将唤醒iOS应用来处理进入或者离开一个beacon区域的时间，通常在10秒内。
+
+在代码的下一个部分，CLBeacon类提供了方法和对象来开启、停止监控指定的iBeacon，和判断哪一个beacon和iOS设备最近的方法类似：
+
+``` c++
+// start ranging beacons
+- (void)locationManager:(CLLocationManager *)manager
+		didEnterRegion:(CLRegion *)region
+{
+    if (![region.identifier isEqualToString:self.beaconRegion.identifier])
+    return;
+            
+    [self.locationManager startRangingBeaconsInRegion:self.beaconRegion];
+    NSLog(@"entered region");
+}
+
+// stop ranging beacons
+- (void)locationManager:(CLLocationManager *)manager
+didExitRegion:(CLRegion *)region
+{
+if (![region.identifier isEqualToString:self.beaconRegion.identifier])
+return;
+[self.locationManager stopRangingBeaconsInRegion:self.beaconRegion];
+NSLog(@"exited region");
+}
+
+// determine closest beacon
+- (void)locationManager:(CLLocationManager *)manager
+        didRangeBeacons:(NSArray *)beacons
+        inRegion:(CLBeaconRegion *)region
+{
+    __block CLBeacon * closestBeacon;
+            
+    if (beacons.count < 1) {
+    	closestBeacon = nil;
+    }
+    else
+    {
+        NSLog(@"locationManager didRangeBeacons: %@", beacons);
+        [beacons enumerateObjectsUsingBlock:^(CLBeacon * beacon, NSUInteger idx, BOOL *stop)
+        {
+            if ((closestBeacon == nil) || (beacon.rssi > closestBeacon.rssi))
+            {
+            	closestBeacon = beacon;
+            }
+            NSLog(@"closest beacon: %@", closestBeacon);
+         }];
+     }
+            
+     if (![self beacon:self.closestBeacon isSameAsBeacon:closestBeacon]) {
+         self.closestBeacon = closestBeacon;
+         [[NSNotificationCenter defaultCenter]
+         postNotificationName:BobsBeaconTracker_ClosestBeaconChanged
+         object:self];
+     }
+}
+
+// compare beacons
+- (BOOL)beacon:(CLBeacon *)beacon isSameAsBeacon:(CLBeacon *)otherBeacon
+{
+    return ([beacon.proximityUUID isEqual:otherBeacon.proximityUUID] &&
+            (beacon.major == otherBeacon.major) &&
+            (beacon.minor == otherBeacon.minor));
+}
+```
+
+如果代码被嵌入一个展馆应用，应用现在可以判断最近的beacon并采取合适的动作（比如，提供一些进一步解释展品的多媒体信息）。
+
+通常，安卓设备也可以使用iBeacon或者BLE beacon。如果你对安卓上使用iBeacon感兴趣，请参阅Radius Network网站[与iBeacon交互的安卓标准API库](http://bit.ly/1jyl2PF)。
+
+## 带拓展显示的苹果通知中心服务
+
+在iOS中的苹果通知中心服务（Apple Notification Center Service，ANCS）功能是通知的来源，作为一个横幅（banner）信息在活动界面（或占据整个活动屏幕）的最顶端适时显示（比如，当你收到一个短信，有一个未接电话，或者各种应用）。比如，当你接收到一个来电，ANCS就会暂时替换活动界面，如图9-5所示：
+
+![figure9-5](.\pic\figure9-5.png)
+
+*图9-5. 在iPhone上的一个来电通知*
+
+当iOS 7推出后，苹果包含了一个BLE界面到ANCS，可以将类似的提示发送到BLE连接的配件中，比如支持BLE的手表。
+
+![figure-bird](.\pic\figure-bird.png) *在ANCS内，iOS设备总是作为一个GATT服务端，显示通知的设备作为一个GATT客户端。为了提高效率，描述ANCS如何工作需要一些术语。对于本部分讨论的，我们将发送ANCS通知的iOS设备作为通知提供者（notification provider，NP），将等待接收通知的配件（比如支持BLE的手表）作为通知消耗者（notification consumer，NC）。*
+
+*显示在iOS设备上的通知也称为iOS通知，通过BLE GATT特征发送的通知被称为GATT通知。*
+
+使用ANCS不需要在iPhone上编码。相反，配件通过一个广播包发送其接收通知的需求，广播包包括了ANCS的服务UUID（7905F431-B5CE-4E99-A40F-4B1E122D00D0）。图9-6展示了这个包的结构。
+
+![figure9-6](.\pic\figure9-6.png)
+
+*图9-6. NC使用的广播包格式*
+
+当NP iOS设备使用ANCS UUID扫描来自NC的广播包，NP与NC配件设备进行连接。现在，一个奇怪的角色互换发生了（至少我们通常认为中心设备和外围设备间的数据流动是这样的）。NC（外围设备）成为一个GATT客户，在NP（ANCS服务）上订阅服务，并从NP（中心设备）iOS设备接收通知和数据。这个很正常，因为如第三章[角色](./chapter3.md#角色)提到的，GAP和GATT角色都彼此独立。
+
+在NP（iOS中心设备）上，苹果通知中心服务UUID是7905F431-B5CE-4E99-A40F-4B1E122D00D0，以下为相关的特征/UUID：
+
+*通知来源（Notification Source）*
+
+​		UUID 9FBF120D-6301-42D9-8C58-25E699A21DBD (可通知)
+
+*控制点（Control Point）*
+
+​		UUID 69D1D8F3-45E1-49A8-9821-9BBDFDAAD9D9 (可写，并回应)
+
+*数据源（Data Source）*
+
+​		UUID 22EAC6E9-24D6-4BB5-BE44-B36ACE7C7BFB (可通知)
+
+通知源（Notification Source）被强制为特征，其他则可选。通常，配件（NC）会订阅GATT服务的服务改变特征（Service Changed characteristic），以自动接收来自通知源的ANCS变更通知。在接收到来自ANCS的新的GATT通知之后，NC可以请求更多信息。为了了解更多，NC向控制点（Control Point）发送（写入）一条信息，包括感兴趣的通知ID和NC希望接收的相关属性列表。之后从数据源（Data Source）的回应中提供这些信息。
+
+NC（外围设备）固件必须执行以下步骤：
+
+1. 开始广播（通常，一秒一次），广播包包含了ANCS UUID以提示范围内任何的NP。
+2. 当NP（iOS设备）连接，对NC设备进行匹配（如果未绑定）或者开启加密。
+3. 列举iOS ANCS设备。
+4. 为通知源设置客户端。
+5. 在通知中，如果需要更多信息，写入一个消息给ANCS控制点。
+6. 从数据源接收回应消息（包含通知ID和数据）。
+
+NC（在这个例子中有个本地化名字BOB）和iOS设备匹配是很直接的。在NC（远端外围设备）开始广播时，你必须在NP（中心设备）iPhone上点击：设置→蓝牙，进行BLE设备的扫描，之后手动匹配设备（如图9-7所示）。这过程不需要pin码。
+
+![figure9-7](.\pic\figure9-7.png)
+
+*图9-7. 匹配NP(中心设备)和NC(远端外设)*
+
+图9-8展示了连接到NC（外设）上的终端仿真屏幕接收到的通知。在这个例子中，NP（iPhone 5）发送三条通知：一个来电、一个未接来电和一个语音邮件信息。
+
+第一行，CALL（通知类别，意思来电）后跟一行是 *ns* ，表示了由NC接收到的通知字符串，并为了显示在终端模拟器上而写入到NC UART口。*done* 字符串表示整个通知的连接完成了。之后软件扫描这通知发送来的数据。
+
+下一个片段的数据为一个UID（全0）和一个来电人名字的文本字符串（来电人ID）：*Davidson Ro*。下一行 *MISSED*，是第二个通知事件的开头（未接来电）。第三个通知（语音邮箱信息）由 *VMAIL* 作为开始。
+
+![figure9-8](.\pic\figure9-8.png)
+
+*图9-8. 显示在远端仿真屏幕上的来电通知*
+
