@@ -8,7 +8,7 @@
 
 本章最后一部分展示实际环境中如何使用这些工具和概念，利用一个在诺迪克的nRF51822片上系统的样例项目，这个项目使用标准心跳配置文件（Heart Rate Profile，关于BLE配置文件请参见第一章[SIG定义的GATT配置文件](./chapter1.md#SIG定义的GATT配置文件)）传输心跳数据给一个iOS或者安卓设备。
 
-![figure-bird](.\pic\figure-bird.png) *样例项目完整代码可在本书[Github目录](http://bit.ly/1qoj8Ed)查看。*
+![figure-bird](./pic/figure-bird.png) *样例项目完整代码可在本书[Github目录](http://bit.ly/1qoj8Ed)查看。*
 
 ## mbed BLE API
 
@@ -65,7 +65,7 @@ GCC在大量的厂商中得到广泛使用，并也可在任何现代操作系�
 arm-none-eabi-gcc --version
 ```
 
-![figure10-1](.\pic\figure10-1.png)
+![figure10-1](./pic/figure10-1.png)
 
 *图10-1. ARM嵌入式处理器的GNU工具的可选下载内容*
 
@@ -87,7 +87,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 在安装结束界面请确认选择了“添加路径到安装变量中”的选项（如图10-2）。这将确保工具链可以从任何位置访问，当使用多辆文件夹和文件位置的时候这将变得非常简便。
 
-![figure10-2](.\pic\figure10-2.png)
+![figure10-2](./pic/figure10-2.png)
 
 *图10.2. 选择添加路径到安装变量中，从而可从任意位置访问*
 
@@ -117,7 +117,7 @@ make --version
 
 代码库并不详尽，但对于你的项目来说这是一个不错的起点。这代码库可以在许多平台（Windows, OS X, or Linux）上编译你的固件，并且提供一个基本的项目框架，便于理解和维护。
 
-![figure-bird](.\pic\figure-bird.png)
+![figure-bird](./pic/figure-bird.png)
 
 > nRF51822 GNU代码库以及本书所有其他的样例代码，都在[本书GitHub仓库中](http://bit.ly/1qoj8Ed)。有必要查看这个仓库，以了解最新代码以及使用在本书出版后可能增加的代码库。
 
@@ -145,7 +145,7 @@ git pull
 
 一旦你有了nRF51822代码库的本地副本，你可以得到像图10-3的文件结构。
 
-![figure10-3](.\pic\figure10-3.png)
+![figure10-3](./pic/figure10-3.png)
 
 *图10-3. nRF51822代码库的纯文件目录结构*
 
@@ -155,13 +155,13 @@ git pull
 
 *lib* 文件夹应包含SDK，SoftDevice，以及任何其他来自Nordic的专有文件。你需要从Nordic的网站上直接下载这些文件，因为证书等问题而不能直接包含这内容。
 
-![figure-bird](.\pic\figure-bird.png)
+![figure-bird](./pic/figure-bird.png)
 
 > 为了从[Nordic半导体网站](http://www.nordicsemi.com/)下载SDK和nRF51822对应的SoftDevice，你需要创建一个MyPage账户，并对印在你的nRF51822-EK的包装上的产品识别码进行注册。产品识别码让你可以对这个芯片集的所有资源进行访问，因此请对产品识别码妥善保存，以防未来需要重新使用。
 
 在下载文件后，添加进文件结构中的*lib* 目录，如图10-4所示：
 
-![figure10-4](.\pic\figure10-4.png)
+![figure10-4](./pic/figure10-4.png)
 
 *图10-4. Nordic的SDK和SoftDevice的文件结构*
 
@@ -181,7 +181,7 @@ make clean release
 
 如果如果一切配置正确，你的命令行结果应该如图10-5所示：
 
-![figure10-5](.\pic\figure10-5.png)
+![figure10-5](./pic/figure10-5.png)
 
 *图10-5. 使用GCC交叉编译并链接成功*
 
@@ -211,7 +211,7 @@ make clean release
 
 为了将你的编程代码写入nRF51822-EK的开发板的非易失性存储器内，你可以使用Nordic的nRFGo Studio工具，这可以在Nordic的网站上一样的MyPages处下载SDK和SoftDevice（见前文[nRF51822 GNU代码库结构](#nRF51822-GNU代码库结构)）。
 
-![figure-bird](.\pic\figure-bird.png)
+![figure-bird](./pic/figure-bird.png)
 
 > nRFGoStudio目前是一个只有Windows可用的工具，但是Roland King已经创建了一个OS X上运行的可替代选择，称为[rknrfgo](http://bit.ly/1qHOqUJ)。这是一个非官方的应用，实现了nRFGo Studio提供的功能的子集，可以在nRF51822上使用易用的GUI来编码进flash内存中。
 
@@ -219,11 +219,11 @@ make clean release
 
 如果你第一次使用你的开发板，首先你将需要写入SoftDevice .hex文件到flash。这会将Nordic的BLE协议栈写入到设备flash存储器的下半部分中。要做到这一点，需要寻找SoftDevice的*.hex* 文件（该文件属于Nordic的网站下载的SoftDevice包里的一部分），并且在nRFGoStudio的Program SoftDevice标签页选择，如图10-6所示。
 
-![figure10-6](.\pic\figure10-6.png)
+![figure10-6](./pic/figure10-6.png)
 
 *图10-6. 使用nRFGo Studio将SoftDevice编码到nRF51822中*
 
-![figure-bird](.\pic\figure-bird.png)
+![figure-bird](./pic/figure-bird.png)
 
 > SoftDevice通常只需要被写入一次，除非你希望升级到一个不同的版本。用户代码在每一次修改程序后都需要进行更新，并且用户代码不会影响SoftDevice，因为他们存储在flash的各自区域。
 
@@ -233,11 +233,11 @@ make clean release
 
 你可以在支持BLE的手机或者平板上通过运行应用来测试代码。首先，从[苹果应用市场](http://bit.ly/1ewDMuD)或者[Google Play](http://bit.ly/PYggkr)下载Nordic的nRF实用程序。在安装应用之后，只需要从主菜单选择HRM并点击连接，就会像图10-8所示一样。
 
-![figure10-7](.\pic\figure10-7.png)
+![figure10-7](./pic/figure10-7.png)
 
 *图10-7. 使用nRFGo Studio编译应用程序代码到nRF51822内*
 
-![figure10-8](.\pic\figure10-8.png)
+![figure10-8](./pic/figure10-8.png)
 
 *图10-8. 使用Nordic的nRF实用程序来可视化心率监测数据*
 

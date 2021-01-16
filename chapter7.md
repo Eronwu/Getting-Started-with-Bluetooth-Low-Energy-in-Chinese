@@ -14,7 +14,7 @@ BLE已经深深进入了移动计算领域，尤其是移动手机和平板，�
 
 如今许多人会将德州仪器（TI）与硬件设计联系在一起，作为自身BLE开发环境的一部分。TI事放了一个非常吸引人并低成本的BLE开发工具，称之为SensorTag（图7-1），这个对于手机应用开发者来说非常的实用。
 
-![figure7-1](.\pic\figure7-1.png)
+![figure7-1](./pic/figure7-1.png)
 
 *图7-1. 德州仪器的SensorTag BLE设备*
 
@@ -51,7 +51,7 @@ SensorTag通过提供一套相当便宜而易组装的传感器套件来解决�
 
 当开发一个BLE从设备时，应用开发者也可以使用LightBlue在iOS或者Android应用的副本完成之后。你可以在中心设备和从设备间模拟无线通讯，让你无需研发一个在中心设备使用的通用应用来调试从设备固件。
 
-![figure7-2](.\pic\figure7-2.png)
+![figure7-2](./pic/figure7-2.png)
 
 *图7-2. LightBlue展示了一个模拟在另一个LightBlue上的BLE设备*
 
@@ -63,7 +63,7 @@ SensorTag通过提供一套相当便宜而易组装的传感器套件来解决�
 
 图7-3展示了一个心跳监控器服务的结果，该服务的身体传感器位置和心率检测数据都可见。
 
-![figure7-3](.\pic\figure7-3.png)
+![figure7-3](./pic/figure7-3.png)
 
 *图7-3. nRF主控制面板展示了一个心率监控器服务*
 

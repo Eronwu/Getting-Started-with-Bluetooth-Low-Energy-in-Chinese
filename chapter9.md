@@ -22,7 +22,7 @@ BLE也支持较新一代的Mac，包括iMac（2012之后出厂的），MacBook P
 
 本章通过研究关注BLE功能的代码示例来对这些框架加以熟悉，特别是实现BLE的应用所需要的关键的类和方法。这些实例描述了一个完整的可以编译的BLE应用的基本内容。虽然实例代码并不完整，不够完善，这也是在一个iOS设备上有着完整的功能，并可以了解到这是怎么运行的，对于编写自己的iOS的BLE应用是一个很好的开始。
 
-![figure-bird](.\pic\figure-bird.png) *所有示例的完整的Xcode项目请见[本书GitHub项目](http://bit.ly/1qoj8Ed)。所有的示例都需要iOS 7或者更新版本，以及Xcode 5或者更新版本。*
+![figure-bird](./pic/figure-bird.png) *所有示例的完整的Xcode项目请见[本书GitHub项目](http://bit.ly/1qoj8Ed)。所有的示例都需要iOS 7或者更新版本，以及Xcode 5或者更新版本。*
 
 一般的说iOS应用开发和Xcode开发环境是一个广泛而复杂的内容，大多超脱了本章或者本书的范围。如果你要寻找更多信息，我们推荐Matt Neuburg编写的*iOS 7编程* 和*iOS 7编程基础* (O’Reilly)。当然，最有权威的源代码是苹果iOS研发库，首发于[核心蓝牙编译指南](http://bit.ly/1eh8soX)。本章的示例都将紧密跟随这本指南。
 
@@ -30,27 +30,27 @@ BLE也支持较新一代的Mac，包括iMac（2012之后出厂的），MacBook P
 
 第一个示例程序是一个iOS中心设备，去搜寻并连接一个简单的远端外围设备。远端外围设备的角色为一个Bluegiga BLE112硬件模组（更多信息参见第五章[Bluegiga’s BLE112/BLE113 Modules](./chapter5.md#"Bluegiga's BLE112/BLE113 Modules)）。iOS设备将作为一个GATT客户端，外围设备作为一个GATT服务端（参见第三章[角色](./chapter3.md#角色)）。
 
-![figure-bird](.\pic\figure-bird.png) *这里使用的Bluegiga BLE112模组评估板可以作为BLE112模组家族(part #: DKBLE112)的一个开发套件的一部分从线上多家供应商获得。开发套件包含了许多预编译传感器和用于快速评估的输入资料。或者，[Jeff Rowberg的BLE112 BLE开发板](http://bit.ly/OQ3seE)更加便宜。这是一个开源硬件解决方案，因此所有的硬件设计详细资料都可以从同一个源获得。*
+![figure-bird](./pic/figure-bird.png) *这里使用的Bluegiga BLE112模组评估板可以作为BLE112模组家族(part #: DKBLE112)的一个开发套件的一部分从线上多家供应商获得。开发套件包含了许多预编译传感器和用于快速评估的输入资料。或者，[Jeff Rowberg的BLE112 BLE开发板](http://bit.ly/OQ3seE)更加便宜。这是一个开源硬件解决方案，因此所有的硬件设计详细资料都可以从同一个源获得。*
 
 BLE112模组实现了BLE外围设备的功能，在这个例子中，使用了板子上的A/D转换器读取了由一个很小的电位器设置的电压值（在图9-1中的左上角被圈出），并通过BLE battery_level服务来保存该值作为BLE“电池电量”特征值（从0到100%数值划分）。iOS应用之后必须读取保存在BLE外围设备的“电池电量”并应用于应用程序。（更多关于服务和特征的信息，参见[第四章](./chapter4.md)）。
 
-![figure9-1](.\pic\figure9-1.png)
+![figure9-1](./pic/figure9-1.png)
 
 *图9-1. Bluegiga BLE112开发套件*
 
-![figure-bird](.\pic\figure-bird.png) *我们使用“电池电量”这个术语，而不是“电位器”，因为“电池电量”外围设备是预定义服务之一，并与在BLE中的特征相联系。尽管没有使用一个预定义配置文件的需求，对于这部分的讨论这么做是比较方便的。*
+![figure-bird](./pic/figure-bird.png) *我们使用“电池电量”这个术语，而不是“电位器”，因为“电池电量”外围设备是预定义服务之一，并与在BLE中的特征相联系。尽管没有使用一个预定义配置文件的需求，对于这部分的讨论这么做是比较方便的。*
 
 对于这个简单的应用，在核心蓝牙框架内提到的关键的类包含了CBCentralManager（iOS设备上，在BLE中的中心管理角色的一个抽象概念）。代码也包含了支持的类CBService和CBCharacteristic，因为你需要知道通过发现来确定哪一个服务和相关的特征在远端外围设备是可以使用的（参见第三章[服务和特征发现](./chapter3.md#服务和特征发现)）。
 
 图9-2展示了写入BLE远端外围设备和CBPeripheral对象的服务和特征之间的关系。
 
-![figure9-2](.\pic\figure9-2.png)
+![figure9-2](./pic/figure9-2.png)
 
 *图9-2. CBPeripheral, CBServices, 和 CBCharacteristic objects的关系*
 
 为了更方便，在示例中的代码包含了一些来自BLE规格书的预定义的服务和特征（比如，电池服务），使用了16bit的UUID而不是厂家定义的129bit的UUID（参见第三章[UUID](./chapter3.md#UUID)）。
 
-![figure-bird](.\pic\figure-bird.png) *对于更多SIG指定的服务和特征信息，蓝牙开发门户（Bluetooth Developer Portal）提供了一个完整的[预定义服务](http://bit.ly/1giCbMM)和[被采纳特征](http://bit.ly/1ggImgY)的列表。
+![figure-bird](./pic/figure-bird.png) *对于更多SIG指定的服务和特征信息，蓝牙开发门户（Bluetooth Developer Portal）提供了一个完整的[预定义服务](http://bit.ly/1giCbMM)和[被采纳特征](http://bit.ly/1ggImgY)的列表。
 
 ### 扫描远端外围设备
 
@@ -294,7 +294,7 @@ iBeacon模型提供了一系列连接设备和基于位置进行通讯的可能�
 
 通常，一个beacon只广播并且不提供其他服务或者连接功能（因为BLE设备一旦连接建立就停止广播）。广播包格式如图9-3所示，遵循标准的BLE广播包格式，并使用厂商指定数据AD类型（参见第三章[广播数据格式](./chapter3.md#广播数据格式)）。
 
-![figure9-3](.\pic\figure9-3.png)
+![figure9-3](./pic/figure9-3.png)
 
 *图9-3. iBeacon使用的广播包格式*
 
@@ -322,11 +322,11 @@ iBeacon应用将测量的RSSI值与beacon发出的广播包内的一米的RSSI�
 
 为了测试应用，我们编写了几个BLE112模块（如图9-4所示），为了便于放置，由硬币单元的CR2032为供电。
 
-![figure9-4](.\pic\figure9-4.png)
+![figure9-4](./pic/figure9-4.png)
 
 *图9-4. BLE112模组，编写为一个iBeacon，并且由CR2032硬币单元供电*
 
-![figure-bird](.\pic\figure-bird.png) *为了测试，Bluegiga BLE112模组产生并传送被要求的iBeacon广播包。已完成的包括iPhone应用和BLE112模组的测试应用的代码都已在[本书的GitHub目录](http://bit.ly/1qoj8Ed)提供。
+![figure-bird](./pic/figure-bird.png) *为了测试，Bluegiga BLE112模组产生并传送被要求的iBeacon广播包。已完成的包括iPhone应用和BLE112模组的测试应用的代码都已在[本书的GitHub目录](http://bit.ly/1qoj8Ed)提供。
 
 首先，你需要创建并注册beacon区域：
 
@@ -422,23 +422,23 @@ NSLog(@"exited region");
 
 通常，安卓设备也可以使用iBeacon或者BLE beacon。如果你对安卓上使用iBeacon感兴趣，请参阅Radius Network网站[与iBeacon交互的安卓标准API库](http://bit.ly/1jyl2PF)。
 
-## 带拓展显示的苹果通知中心服务
+## 带外部显示的苹果通知中心服务
 
 在iOS中的苹果通知中心服务（Apple Notification Center Service，ANCS）功能是通知的来源，作为一个横幅（banner）信息在活动界面（或占据整个活动屏幕）的最顶端适时显示（比如，当你收到一个短信，有一个未接电话，或者各种应用）。比如，当你接收到一个来电，ANCS就会暂时替换活动界面，如图9-5所示：
 
-![figure9-5](.\pic\figure9-5.png)
+![figure9-5](./pic/figure9-5.png)
 
 *图9-5. 在iPhone上的一个来电通知*
 
 当iOS 7推出后，苹果包含了一个BLE界面到ANCS，可以将类似的提示发送到BLE连接的配件中，比如支持BLE的手表。
 
-![figure-bird](.\pic\figure-bird.png) *在ANCS内，iOS设备总是作为一个GATT服务端，显示通知的设备作为一个GATT客户端。为了提高效率，描述ANCS如何工作需要一些术语。对于本部分讨论的，我们将发送ANCS通知的iOS设备作为通知提供者（notification provider，NP），将等待接收通知的配件（比如支持BLE的手表）作为通知消耗者（notification consumer，NC）。*
+![figure-bird](./pic/figure-bird.png) *在ANCS内，iOS设备总是作为一个GATT服务端，显示通知的设备作为一个GATT客户端。为了提高效率，描述ANCS如何工作需要一些术语。对于本部分讨论的，我们将发送ANCS通知的iOS设备作为通知提供者（notification provider，NP），将等待接收通知的配件（比如支持BLE的手表）作为通知消耗者（notification consumer，NC）。*
 
 *显示在iOS设备上的通知也称为iOS通知，通过BLE GATT特征发送的通知被称为GATT通知。*
 
 使用ANCS不需要在iPhone上编码。相反，配件通过一个广播包发送其接收通知的需求，广播包包括了ANCS的服务UUID（7905F431-B5CE-4E99-A40F-4B1E122D00D0）。图9-6展示了这个包的结构。
 
-![figure9-6](.\pic\figure9-6.png)
+![figure9-6](./pic/figure9-6.png)
 
 *图9-6. NC使用的广播包格式*
 
@@ -471,7 +471,7 @@ NC（外围设备）固件必须执行以下步骤：
 
 NC（在这个例子中有个本地化名字BOB）和iOS设备匹配是很直接的。在NC（远端外围设备）开始广播时，你必须在NP（中心设备）iPhone上点击：设置→蓝牙，进行BLE设备的扫描，之后手动匹配设备（如图9-7所示）。这过程不需要pin码。
 
-![figure9-7](.\pic\figure9-7.png)
+![figure9-7](./pic/figure9-7.png)
 
 *图9-7. 匹配NP(中心设备)和NC(远端外设)*
 
@@ -481,7 +481,7 @@ NC（在这个例子中有个本地化名字BOB）和iOS设备匹配是很直接
 
 下一个片段的数据为一个UID（全0）和一个来电人名字的文本字符串（来电人ID）：*Davidson Ro*。下一行 *MISSED*，是第二个通知事件的开头（未接来电）。第三个通知（语音邮箱信息）由 *VMAIL* 作为开始。
 
-![figure9-8](.\pic\figure9-8.png)
+![figure9-8](./pic/figure9-8.png)
 
 *图9-8. 显示在远端仿真屏幕上的来电通知*
 

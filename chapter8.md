@@ -16,7 +16,7 @@
 
 对于硬件，你需要一个安卓设备运行安卓4.3或更高的版本。安卓开始支持BLE的版本为4.3，但我们建议设备至少运行的是安卓4.4版本，这包含了一个已经升级的并且更稳定的BLE协议栈的版本。你也需要确认硬件是否支持BLE。这里的样例项目使用的是运行安卓4.4的谷歌Nexus7。
 
-![figure-bird](.\pic\figure-bird.png) *为了确认设备是否支持BLE，参见蓝牙的[智能设备列表](http://bit.ly/1iDPs0M)。*
+![figure-bird](./pic/figure-bird.png) *为了确认设备是否支持BLE，参见蓝牙的[智能设备列表](http://bit.ly/1iDPs0M)。*
 
 你也需要选一个TI的SensorTag，在这个项目中作为从设备服务。更多关于SensorTag设备请参见第七章[SensorTag](./chapter7.md#SensorTag)。
 
@@ -42,19 +42,19 @@
 
 在可以使用作为开发设备前，安卓设备需要一些配置。首先，你需要激活开发者模式，如果该模式并没有被开启。进入设置菜单，滑倒底部，并选择关于。在关于的界面上（见图8-1），快速点击“编译版本”7次开启开发者模式。
 
-![figure8-1](.\pic\figure8-1.png)
+![figure8-1](./pic/figure8-1.png)
 
 *图8-1. 从关于界面开启开发者模式*
 
 你应该可以在设置菜单中看到一个新的“开发者选项”条目。现在，你将需要开启“USB调试”和“保持唤醒”选项，如图8-2所示。
 
-![figure8-2](.\pic\figure8-2.png)
+![figure8-2](./pic/figure8-2.png)
 
 *图8-2. 在”开发者选项“中开启“USB调试”和保持唤醒“选项*
 
 最后，前往设置菜单，选择 保存→选项→“USB电脑连接”，并使能相机选项（如图8-3）去允许进行文件传输。
 
-![figure8-3](.\pic\figure8-3.png)
+![figure8-3](./pic/figure8-3.png)
 
 *图8-3. 配置安卓作为一个相机进行传输文件*
 
@@ -70,17 +70,17 @@
 
 如图8-4所示（该图在左边展示了项目目录结构，左边为主代码窗口），一个安卓项目含了许多文件夹和文件，但是你只需要在里面的一部分进行工作。主要的源程序文件时位于 /src 目录。
 
-![figure8-4](.\pic\figure8-4.png)
+![figure8-4](./pic/figure8-4.png)
 
 *图8-4. Eclipse中主要的Java窗口*
 
 每一个项目都包含了一个清单（manifest），为AndroidManifest.xml，展现了该应用对于安卓系统的具体要素信息。安卓在系统内运行任何程序之前需要一些信息。除此之外，你也将用到 /res 文件夹，这包含了XML的文件，掌控了一些将会用到的布局和菜单。
 
-![bird](.\pic\figure-bird.png) *安卓程序是一个大型的内容，远超过本章的范围，本章只关注于整合BLE到安卓应用的部分。对于更多复杂的GUI部分，我们推荐你咨询其他安卓编程文章。*
+![bird](./pic/figure-bird.png) *安卓程序是一个大型的内容，远超过本章的范围，本章只关注于整合BLE到安卓应用的部分。对于更多复杂的GUI部分，我们推荐你咨询其他安卓编程文章。*
 
 在你开始任何实际的编写代码之前，你需要给与安卓清单（manifest）BLUETOOTH和BLUETOOTH_ADMIN权限。双击AndroidManifest.xml文件，选择权限标签（Permissions tab，见图8-5）.选择“增加...”→“用户权限”，将android.permission.BLUETOOTH 输入进名称框里。在另一个“用户权限”里面重复一遍动作，这回写上android.permission.BLUETOOTH_ADMIN。当应用安装好后，这两个条目会要求用户访问该名字服务的权限。
 
-![figure8-5](.\pic\figure8-5.png)
+![figure8-5](./pic/figure8-5.png)
 
 *图8-5. 安卓清单文件权限窗口*
 
@@ -93,7 +93,7 @@
 
 将文件复制到BleSensorTag项目的 /src 目录（或者拖放到该目录）。一旦你增加了这些文件，/src 目录就如图8-6。
 
-![figure8-6](.\pic\figure8-6.png)
+![figure8-6](./pic/figure8-6.png)
 
 *图8-6. 安卓 /src 目录*
 
@@ -178,7 +178,7 @@ protected void onResume() {
 }
 ```
 
-![figure-bird](.\pic\figure-bird.png) *Eclipse提供一个快速建立这些函数的捷径。只需要敲方法名字的一开头部分的几个字母，之后按Ctrl+Spacebar。从弹出的自动完成列表中选择函数，让Eclipse为你建造函数。*
+![figure-bird](./pic/figure-bird.png) *Eclipse提供一个快速建立这些函数的捷径。只需要敲方法名字的一开头部分的几个字母，之后按Ctrl+Spacebar。从弹出的自动完成列表中选择函数，让Eclipse为你建造函数。*
 
 这里的样板代码为super.onResume()。你需要在这后边加入自有代码。在这个案例中，你需要检查蓝牙在每一次从一个不同的context或者睡眠中恢复后，是否是可以用的。当其他程序使用在用时，蓝牙可能已经被关闭了。不去捕获状态改变仅仅假设蓝牙一直时开启的，这将会最终导致一些故障发生，或者软件的异常。为处理这种状况，如果程序发现蓝牙是关闭的，就将使用Android intent发送给用户一个请求，去打开蓝牙并退出应用。下一次应用重新打开的时候，如果蓝牙是开启的，程序就将继续进行。
 
@@ -211,7 +211,7 @@ protected void onPause() {
 在安卓菜单GUI中，选择增加→项目，并使用“扫描动作”（action_scan）和“扫描结束”（ac
 tion_stop）作为名字，如图8-7。这将作为按键的ID，当你为菜单按键写入点击处理的时候，你可以使用该ID。在菜单项的标题区域，各自敲击扫描（Scan）和停止（Stop），以在菜单项上显示文字。
 
-![figure8-7](.\pic\figure8-7.png)
+![figure8-7](./pic/figure8-7.png)
 
 *图8-7. 在安卓ADT菜单中增加按键*
 
@@ -254,8 +254,7 @@ mBleWrapper = new BleWrapper(this, new BleWrapperUiCallbacks.Null()
     final byte[] record
     )
     {
-        String msg = "uiDeviceFound: "+device.getName()+", "+rssi+",
-        "+rssi.toString();
+        String msg = "uiDeviceFound: "+device.getName()+", "+rssi+","+rssi.toString();
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
         Log.d("DEBUG", "uiDeviceFound: " + msg);
     }
@@ -268,7 +267,7 @@ toast弹出信息显示两个来自广播包的内容：设备名字（参见第
 
 代码不仅在toast消息窗输出相同的信息，也通过Log命令输出日志信息，Log时一个安卓库。在Eclipse IDE使用logcat工具调试中，Log信息会进行显示（见图8-8）。当你使用Log命令，你可以指定一个标签（tag）。使用这个很棒的工具，你可以用标签过滤掉大量的信息。
 
-![figure8-8](.\pic\figure8-8.png)
+![figure8-8](./pic/figure8-8.png)
 
 *图8-8. 来自Log命令的消息在完整的logcat堆放的信息高亮显示*
 
@@ -330,7 +329,7 @@ public void uiAvailableServices(BluetoothGatt gatt,
 
 该代码遍历了每一个服务列表中的元素。对于每一个服务，其将UUID转换为一个字符串值并传给BleNamesResolverBleNamesResolver.resolveUuid()方法。该方法查找已知的UUID列表，当找到一个匹配的UUID，就返回相关的可读的UUID名字。代码将通过logcat打印出名字到Eclipse IDE中。正如图8-9所示。这也可以导出信息到文本框中，但是这就稍微麻烦了点。
 
-![figure8-9](.\pic\figure8-9.png)
+![figure8-9](./pic/figure8-9.png)
 
 *图8-9. Eclipse中，logcat显示了服务和特征*
 
