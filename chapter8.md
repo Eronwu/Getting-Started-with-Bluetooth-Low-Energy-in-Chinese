@@ -1,111 +1,111 @@
-# 第八章，安卓编程
+# 第八章 Android 编程
 
-使用一个像BLE的无线标准的其中一个好处是其对各种广泛的智能手机和平板的支持。无线标准打开了一个新的与嵌入式硬件项目相沟通的维度，如今已经可以用廉价的硬件和大量接口进行设计。
+使用蓝牙低功耗这样的无线标准的主要好处之一是它支持各种各样的智能手机和平板。这为嵌入式硬件项目打开了一个新的交互维度，现在可以使用廉价的硬件和丰富的界面进行设计。
 
-在接口之外，你可以使用手机作为进入更大的互联网的入口，或者结合其他应用或者API创建一个与你自己创建的嵌入式硬件混合的程序。这使得一个新的类型的便宜设备可以使用，还提供大量的功能。
+除了界面之外，你还可以将手机用作通往更广阔互联网的网关，或与其他应用或 API 结合，与你创建的嵌入式硬件创建自定义的混搭应用。这使一整类新型廉价设备能够提供丰富的功能。
 
-本章介绍了软硬件，以及在安卓操作系统上加入BLE功能的流程需求的一个基本概括。
+本章简要概述了在 Android 操作系统上实现蓝牙低功耗所需的硬件、软件和流程。
 
-## 开始
+## 入门
 
-本章的安卓项目开发范例基于德州仪器（TI）制造的低成本的SensorTag（见第七章[SensorTag](./chapter7.md#SensorTsag)）设备。SensorTag提供了许多传感器，是一个可以提供大量信息进行处理和可视化的很好的复杂传感器设备的例子。
+本章开发的 Android 示例项目与德州仪器（TI）制造的低成本 SensorTag 设备（第七章[SensorTag](./chapter7.md#sensortag)）进行交互。SensorTag 提供了许多传感器，是一个很好的复杂传感器设备示例，可以提供大量信息进行处理和可视化。
 
-因为安卓的GUI端会有一点复杂，超过本书介绍的范围，本章将聚焦于你将从SensorTag的哪里提取以及通过BLE获取数据。在一点上，许多其他可用的资源可以来证明展示数据。
+因为 Android 的 GUI 方面可能有点复杂，通常超出本书的范围，本章重点介绍如何从 SensorTag 提取数据并通过蓝牙低功耗接收它。在那之后，许多其他可用资源可以展示呈现数据的方法。
 
 ### 获取硬件
 
-对于硬件，你需要一个安卓设备运行安卓4.3或更高的版本。安卓开始支持BLE的版本为4.3，但我们建议设备至少运行的是安卓4.4版本，这包含了一个已经升级的并且更稳定的BLE协议栈的版本。你也需要确认硬件是否支持BLE。这里的样例项目使用的是运行安卓4.4的谷歌Nexus7。
+对于硬件，你需要一个运行 Android 4.3 或更高版本的 Android 设备。虽然 Android 从 4.3 版本开始支持 BLE，但我们建议至少使用运行 4.4 版本的设备，其中包含更新且更稳定的 BLE 协议栈版本。你还需要确保硬件支持蓝牙低功耗。本示例项目使用运行 Android 4.4 的 Google Nexus 7。
 
-![figure-bird](./pic/figure-bird.png) *为了确认设备是否支持BLE，参见蓝牙的[智能设备列表](http://bit.ly/1iDPs0M)。*
+> 注意：要确认你的设备是否支持 BLE，请参阅蓝牙的[智能设备列表](http://bit.ly/1iDPs0M)。
 
-你也需要选一个TI的SensorTag，在这个项目中作为从设备服务。更多关于SensorTag设备请参见第七章[SensorTag](./chapter7.md#SensorTag)。
+你还需要购买一个 TI SensorTag，它将作为本项目中的外围设备。有关 SensorTag 设备的更多信息，请参见第七章[SensorTag](./chapter7.md#sensortag)。
 
-## 获取软件
+### 获取软件
 
-对于这个项目，你需要三款软件：
+对于本项目，你需要三个主要软件：
 
-*Eclipse安卓开发工具（ADT）*
+*Eclipse Android 开发工具（ADT）*
 
-​	可在[安卓开发网站](http://bit.ly/PYcBmE)使用。
+  可在 [Android 开发者网站](http://bit.ly/PYcBmE) 获取。
 
 *蓝牙应用加速器*
 
-​	可在[蓝牙SIG网站](http://bit.ly/1kQPQuv)使用。
+  可在 [蓝牙 SIG 网站](http://bit.ly/1kQPQuv) 获取。
 
-*TI SensorTag安卓应用资源代码*
+*TI SensorTag Android 应用源代码*
 
-​	可在[TI网站](http://bit.ly/1kR0aTd)使用。
+  可在 [TI 网站](http://bit.ly/1kR0aTd) 获取。
 
-安装过程中最重要、最耗时的部分是安装安卓开发工具，这需要懂一点如何使用Eclipse IDE。你最好去[安卓开发网站](http://bit.ly/PYcBmE)得到更多关于设置开发环境的指示。你将需要下载最新的SDK以及进行所有的安卓开发工具的更新。
+设置过程中最重要且最耗时的部分是安装 Android 开发工具，这也需要了解一些如何使用 Eclipse IDE 的知识。你最好前往 [Android 开发者网站](http://bit.ly/PYcBmE) 获取有关设置工作环境的详细说明。你需要下载最新的 SDK 以及 Android 开发者工具的任何更新。
 
-## 配置硬件
+### 配置硬件
 
-在可以使用作为开发设备前，安卓设备需要一些配置。首先，你需要激活开发者模式，如果该模式并没有被开启。进入设置菜单，滑倒底部，并选择关于。在关于的界面上（见图8-1），快速点击“编译版本”7次开启开发者模式。
+Android 设备在用作开发设备之前需要进行一些配置。首先，如果尚未启用，你需要启用开发者模式。进入设置菜单，滚动到底部，选择"关于"。在"关于"屏幕上（如图 8-1 所示），快速连续点击"版本号"七次以启用开发者模式。
 
 ![figure8-1](./pic/figure8-1.png)
 
-*图8-1. 从关于界面开启开发者模式*
+*图 8-1. 从"关于"屏幕启用开发者模式*
 
-你应该可以在设置菜单中看到一个新的“开发者选项”条目。现在，你将需要开启“USB调试”和“保持唤醒”选项，如图8-2所示。
+你现在应该在设置菜单中看到一个新的"开发者选项"条目。现在，你需要启用"USB 调试"和"保持唤醒"选项，如图 8-2 所示。
 
 ![figure8-2](./pic/figure8-2.png)
 
-*图8-2. 在”开发者选项“中开启“USB调试”和保持唤醒“选项*
+*图 8-2. 在"开发者选项"屏幕上启用"USB 调试"和"保持唤醒"选项*
 
-最后，前往设置菜单，选择 保存→选项→“USB电脑连接”，并使能相机选项（如图8-3）去允许进行文件传输。
+最后，进入设置菜单，选择存储→选项→"USB 计算机连接"，并启用相机选项（如图 8-3 所示）以允许你传输文件。
 
 ![figure8-3](./pic/figure8-3.png)
 
-*图8-3. 配置安卓作为一个相机进行传输文件*
+*图 8-3. 将 Android 配置为相机以传输文件*
 
-这听起来似乎反人类，但是设备需要进入相机模式才可以作为开发工具进行工作。
+这听起来可能违反直觉，但设备需要处于相机模式才能使开发工具正常工作。
 
-### 开始一个新的项目
+### 开始新项目
 
-为了开启一个新的项目，你需要导入蓝牙应用加速器（Bluetooth Application Accelerator）的安卓文件到这个项目。打开Eclipse ADT，选择文件/导入，导航到含有应用加速器的文件目录，选择安卓/BLE范例的文件夹。点击OK导入项目到工作空间。
+要开始新应用，你首先需要将蓝牙应用加速器的 Android 文件导入项目。打开 Eclipse ADT，选择文件/导入，导航到包含应用加速器的目录，选择 Android/BLEDemo 文件夹。按确定将项目导入工作区。
 
-在这一点上，你可能希望粗略看下应用加速器文件是怎么布局的。如果这个对于你来说看起来比较陌生，不用担心。相比花大量时间在应用加速器里面，你只需要将BLE库主要的类文件移到自己项目中即可。
+此时，你可能想浏览一下应用加速器文件，了解代码的布局方式。如果看起来陌生，不用担心。与其花太多时间在应用加速器内部，不如将 BLE 库的主要类文件移动到你自己的项目中。
 
-现在是时候创建自有的安卓项目了。在Eclipse内，选择文件→新建→安卓应用项目。对于应用名字，使用BleSensorTag。最小SDK需求的版本，指定安卓4.3版本。这个是安卓支持BLE的最低版本。对于目标SDK和编译，使用设备所支持的最新安卓版本。接收默认，点击剩余窗口的下一步。最后，项目向导（project wizard）会创建一个新的称为BleSensorTag的安卓项目。
+现在是时候创建你自己的 Android 项目了。在 Eclipse 中，转到文件→新建→Android 应用项目。对于应用名称，使用 BleSensorTag。对于最低所需 SDK，指定 Android 4.3。这是支持蓝牙低功耗的 Android 最低版本。对于目标 SDK和编译版本，使用设备支持的最新 Android 版本。点击下一步接受其余窗口的默认值。最后，项目向导应该为你创建一个名为 BleSensorTag 的新 Android 项目。
 
-如图8-4所示（该图在左边展示了项目目录结构，左边为主代码窗口），一个安卓项目含了许多文件夹和文件，但是你只需要在里面的一部分进行工作。主要的源程序文件时位于 /src 目录。
+如图 8-4 所示（左侧显示项目目录结构，右侧显示主代码窗口），Android 项目包含许多文件夹和文件，但你只在其中少数几个中工作。主要源代码文件位于 /src 目录中。
 
 ![figure8-4](./pic/figure8-4.png)
 
-*图8-4. Eclipse中主要的Java窗口*
+*图 8-4. Eclipse 中的主 Java 窗口*
 
-每一个项目都包含了一个清单（manifest），为AndroidManifest.xml，展现了该应用对于安卓系统的具体要素信息。安卓在系统内运行任何程序之前需要一些信息。除此之外，你也将用到 /res 文件夹，这包含了XML的文件，掌控了一些将会用到的布局和菜单。
+每个项目还包括一个清单文件 AndroidManifest.xml，它向 Android 系统详细说明应用的基本信息。Android 在系统上运行任何代码之前需要此信息。除此之外，你还将在 /res 文件夹中工作，其中包含处理你将使用的布局和菜单的 XML 文件。
 
-![bird](./pic/figure-bird.png) *安卓程序是一个大型的内容，远超过本章的范围，本章只关注于整合BLE到安卓应用的部分。对于更多复杂的GUI部分，我们推荐你咨询其他安卓编程文章。*
+> 注意：Android 编程本身是一个庞大的主题，远超本章范围，本章仅关注将蓝牙低功耗集成到 Android 应用的上下文。对于更复杂的 GUI 应用，我们建议查阅其他 Android 编程书籍。
 
-在你开始任何实际的编写代码之前，你需要给与安卓清单（manifest）BLUETOOTH和BLUETOOTH_ADMIN权限。双击AndroidManifest.xml文件，选择权限标签（Permissions tab，见图8-5）.选择“增加...”→“用户权限”，将android.permission.BLUETOOTH 输入进名称框里。在另一个“用户权限”里面重复一遍动作，这回写上android.permission.BLUETOOTH_ADMIN。当应用安装好后，这两个条目会要求用户访问该名字服务的权限。
+在开始任何实际编码之前，你需要在 Android 清单中启用 BLUETOOTH 和 BLUETOOTH_ADMIN 权限。双击 AndroidManifest.xml 文件并选择权限选项卡（如图 8-5 所示）。选择"添加..."→"Uses Permission"，在名称字段中输入 android.permission.BLUETOOTH。同样添加另一个"Uses Permission"，这次命名为 android.permission.BLUETOOTH_ADMIN。这两个条目在应用安装时请求用户访问命名服务的权限。
 
 ![figure8-5](./pic/figure8-5.png)
 
-*图8-5. 安卓清单文件权限窗口*
+*图 8-5. Android 清单权限窗口*
 
-现在，你需要从蓝牙应用加速器内移入一些类的文件到项目中。这将会使类文件和方法为自己所用，让BLE编程变得更为简便。选择和复制以下文件：
+现在，你需要将类文件从蓝牙应用加速器移动到项目中。这将使类和方法对你可用，其中许多方法使 BLE 编程变得容易得多。选择并复制以下文件：
 
 - BleWrapper.java
 - BleWrapperUiCallbacks.java
 - BleNamesResolver.java
 - BleDefinedUUIDs.java
 
-将文件复制到BleSensorTag项目的 /src 目录（或者拖放到该目录）。一旦你增加了这些文件，/src 目录就如图8-6。
+将文件粘贴到 BleSensorTag 项目的 /src 目录中（或拖放到该目录）。添加这些文件后，/src 目录应如图 8-6 所示。
 
 ![figure8-6](./pic/figure8-6.png)
 
-*图8-6. 安卓 /src 目录*
+*图 8-6. Android /src 目录*
 
-BleWrapper是由蓝牙SIG组织发布的应用加速器库的主要部分。这是安卓BLE库的一个简化封装，使访问和使用库都更简便，因为其掌管了大量复杂的处理流程。
+BleWrapper 是蓝牙 SIG 发布的应用加速器库的主要部分。它是 Android 蓝牙低功耗库的简化封装，使访问和使用库变得简单得多，因为它处理了许多复杂的处理。
 
-这就完成了项目的前期工作。现在你已经创建了这个项目，配置了清单文件，安装了类的库文件，你已经准备好安卓代码的大餐了。
+这完成了项目的准备工作。现在你已经创建了项目、配置了清单、安装了类库，可以开始进入 Android 代码的核心部分了。
 
-## 初始化BLE库
+## 初始化 BLE 库
 
-是时候开始实作了。第一步（强调BLE的编码中心，而不是过多在GUI的一侧），范例将会主要打印出BLE收到的信息。之后，你将增加一些GUI特性来将BLE的数据展示出来。
+现在是时候进入实际实现了。第一次（为了强调编程的 BLE 方面而不过多深入 GUI 方面），示例将主要打印通过蓝牙低功耗接收的信息。之后，你将添加一些 GUI 功能，将 BLE 数据整合到呈现方面。
 
-在你开始之前，你需要创建一个已导入的BleWrapper库的实例。这文件是来自蓝牙SIG组织的蓝牙应用加速器：
+在开始之前，你需要创建导入的 BleWrapper 库的实例。这是来自蓝牙 SIG 的蓝牙应用加速器库的文件：
 
 ```java
 public class MainActivity extends Activity {
@@ -116,18 +116,19 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-	}
+    }
+}
 ```
 
-文件中增加的这行为创建BleWrapper类的实例，这包含了你将用于访问底层安卓BLE库的方法。在指导手册中，你还需增加一些回调函数（callback），这是来自安卓BLE库内的一些处理事件。
+此文件中添加的行将保存 BleWrapper 类的实例，其中还包含你将用于访问底层 Android BLE 库的方法。在你的构造函数中，你还将添加各种回调，用于处理来自 Android BLE 库的事件。
 
-在之前的代码段中，可以注意到自动生成的一个函数叫做onCreate()。当应用初始启动时该函数被调用，你将在开始阶段使用该函数进行一些初始化，有且只执行一次。这函数包含的是，如果设备进入睡眠或者context丢失之后再重新返回的情况下，不需要再重新初始化的内容。
+在前面的代码片段中，注意一个自动生成的函数 onCreate()。此函数在应用首次启动时调用，你将使用它来初始化启动时需要且只需初始化一次的内容。这包括如果设备进入睡眠或丢失上下文然后返回时不需要重新初始化的成员。
 
-安卓的文献中都由概括出“activity生命周期”的概念，描述了应用在其自身“生命”过程中不同的阶段的方法。如当应用开启时，三个独立的生命周期方法将被调用：onCreate(), onStart(), 和onResume()。当仅需要初始化一次就初始化应用onCreate()的类，当设备进入睡眠或者context丢失的情况下需要重新初始化则初始化onResume()的类。
+Android 文档实际上概述了"activity 生命周期"，描述了应用在经历其"生命"的不同阶段时调用的方法。例如，当应用启动时，会调用三个单独的生命周期方法：onCreate()、onStart() 和 onResume()。在应用类中初始化变量发生在 onCreate() 中（仅初始化一次），以及在 onResume() 中（如果设备进入睡眠或丢失上下文则需要重新初始化时）。
 
-文献中提供了在这个activity生命周期内更多的信息，这是需要理解的很重要的概念，因为你将初始例行程序的一部分做在onCreate()里面，一部分做在onResume()里面。当关机时你也将需要处理一些收尾部分，这将在onPause()或者onStop()完成。
+文档提供了有关此 activity 生命周期的更多信息，但这是一个需要了解的重要概念，因为你将在 onCreate() 中执行部分初始化例程，在 onResume() 中执行另一部分。你还需要在关闭时处理清理，这将在 onPause() 或 onStop() 中完成。
 
-在onCreate()方法里面，你将看到部分由项目向导（project wizard）生成的样板（boilerplate）代码。在这之后，你将增加更多的代码去初始化你的mBleWrapper对象以及完成其他初始任务：
+在 onCreate() 方法内部，你将看到项目向导生成的一些样板代码。在其下方，你将添加更多代码来初始化 mBleWrapper 对象并执行其他初始化任务：
 
 ```java
 @Override
@@ -143,146 +144,143 @@ protected void onCreate(Bundle savedInstanceState)
     if (mBleWrapper.checkBleHardwareAvailable() == false)
     {
         Toast.makeText(this, "No BLE-compatible hardware detected",
-        Toast.LENGTH_SHORT).show();
+                       Toast.LENGTH_SHORT).show();
         finish();
     }
 }
 ```
 
-这部分代码通过将其实例化并调用自身构造函数（constructor），分配了一个新BleWrapper对象到mBleWrapper成员变量中（上一段为空）。当进行该封装器(wrapper)的实例化时，你还需要增加一个BLE回调函数作为该构造函数的一个参数。这里就是增加处理一些来自BLE协议栈的通知事件代码的地方。
+前面的代码通过实例化并调用其构造函数，将新的 BleWrapper 对象分配给 mBleWrapper 成员变量（之前为 null）。实例化封装器时，你还需要将 BLE 回调作为参数添加到构造函数中。这是你添加代码以处理来自 BLE 协议栈的通知事件的地方。
 
-在软件编程中，*回调函数（callback）*作为一个可执行代码的引用，作为一个参数被传入函数中，当函数完成执行完毕之后将回调这段代码。对于现在，我们对这个构造函数不增加任何回调，之后再回来看这部分。
+在软件编程中，回调是对可执行代码的引用，作为参数传递给函数，函数期望在完成某些处理后回调该代码。目前，我们不会向构造函数添加任何回调，但稍后我们会重新讨论这一点。
 
-在完成构造函数之后，代码执行一个检查，确认BLE硬件是否在这个系统上可用。如果为否，一个称为“Toast”的弹出信息框会提示用户缺失BLE硬件，并关闭app。
+构造函数之后，代码执行检查以确保 BLE 硬件对系统可用。如果不是，名为"Toast"的弹出消息窗口会通知用户缺少 BLE 硬件，然后关闭应用。
 
-这里就完成了应用启动时需要在onCreate()方法内执行的代码。现在看onResume()方法，该方法在应用启动以及应用在任何时候从睡眠中恢复时执行代码：
+这完成了应用启动时在 onCreate() 方法中需要执行的代码。现在转到 onResume() 方法，这是代码在启动以及从睡眠中唤醒时执行的地方：
 
 ```java
 @Override
 protected void onResume() {
     super.onResume();
-    
-	// check for Bluetooth enabled on each resume
+    // check for Bluetooth enabled on each resume
     if (mBleWrapper.isBtEnabled() == false)
     {
         // Bluetooth is not enabled. Request to user to turn it on
         Intent enableBtIntent = new Intent(BluetoothAdapter.
-        ACTION_REQUEST_ENABLE);
+                                           ACTION_REQUEST_ENABLE);
         startActivity(enableBtIntent);
         finish();
     }
-    
     // init ble wrapper
     mBleWrapper.initialize();
-    }
 }
 ```
 
-![figure-bird](./pic/figure-bird.png) *Eclipse提供一个快速建立这些函数的捷径。只需要敲方法名字的一开头部分的几个字母，之后按Ctrl+Spacebar。从弹出的自动完成列表中选择函数，让Eclipse为你建造函数。*
+> 提示：Eclipse 为任何这些函数提供了快速快捷方式。只需输入方法名称的前几个字母，然后按 Ctrl+Spacebar。从弹出的自动完成列表中选择函数，让 Eclipse 为你构建函数。
 
-这里的样板代码为super.onResume()。你需要在这后边加入自有代码。在这个案例中，你需要检查蓝牙在每一次从一个不同的context或者睡眠中恢复后，是否是可以用的。当其他程序使用在用时，蓝牙可能已经被关闭了。不去捕获状态改变仅仅假设蓝牙一直时开启的，这将会最终导致一些故障发生，或者软件的异常。为处理这种状况，如果程序发现蓝牙是关闭的，就将使用Android intent发送给用户一个请求，去打开蓝牙并退出应用。下一次应用重新打开的时候，如果蓝牙是开启的，程序就将继续进行。
+这里的样板代码在顶部是 super.onResume()。你将在其下方添加自己的代码。在这种情况下，你需要在设备每次从不同上下文或睡眠中回来时检查蓝牙是否已启用。当使用其他程序时，蓝牙可能已关闭。不捕获该变化而只是假设蓝牙仍然开启最终会导致某种类型的故障或软件异常。为了处理这种情况，如果程序发现蓝牙已关闭，它会使用 Android intent 向用户发送请求以打开蓝牙，然后退出应用。下次应用重新启动时，如果蓝牙已开启，它可以继续。
 
-一旦代码通过前面的检查，就将开始初始化BleWrapper，这将打开蓝牙界面并从安卓蓝牙适配器（Android Bluetooth adapter）内获取一个实例。一旦你得到该实例，你就可以访问BLE无线模块和协议的函数。
+一旦代码通过最后的检查，它就可以初始化 BleWrapper，这将打开蓝牙接口并获取 Android 蓝牙适配器的实例。一旦你有了这个，你就可以访问 BLE 射频和协议函数。
 
-最后，你需要处理安卓生命周期的最后一个方法，onPause()。在任何context丢失、设备进入睡眠状态、或者应用关闭的时候，该方法都被调用：
+最后，你需要处理最后一个 Android 应用生命周期方法：onPause()。每当丢失上下文、设备进入睡眠或应用关闭时，都会调用此方法：
 
 ```java
 @Override
 protected void onPause() {
     super.onPause();
-    
     mBleWrapper.diconnect();
     mBleWrapper.close();
 }
 ```
 
-在我们的范例中，安卓设备将作为一个GAP中心设备和一个GATT客户端，并且SensorTag设备将会作为一个GAP从设备和一个GATT服务端（参见第三章[角色](./chapter3.md#角色)和第四章[角色](./chapter4.md#角色)）。
+在我们的示例中，Android 设备将充当 GAP 中心和 GATT 客户端，SensorTag 设备将充当 GAP 外围设备和 GATT 服务器（见第三章[角色](./chapter3.md#角色)和第四章[角色](./chapter4.md#角色)）。
 
-还是一样，样板代码保持在顶部。在这之后，程序调用两个封装器的方法。第一个方法让你去与远端设备“断开连接”。这个实际上是与远端从设备断开连接，并执行uiDeviceDisconnected()的回调方法。如果你需要在与从设备断开连接之后处理一些事情，你需要复写uiDeviceDisconnected()回调函数。最后，关闭BleWrapper，即完全关闭本地GATT客户端和中心设备。
+同样，样板代码保持在顶部。之后，它调用封装器的两个方法。第一个方法允许你"diconnect"（原文如此）我们的 Android 设备与远程设备。这实际上断开了与远程外围设备的连接，并调用 uiDeviceDisconnected() 回调方法。如果你需要在与外围设备断开连接后处理任何内容，你将覆盖 uiDeviceDisconnected() 回调。最后，我们关闭 BleWrapper，这将完全关闭本地 GATT 客户端和中心。
 
-## 连接到远端设备
+## 连接到远程设备
 
-现在初始化和结束清除都已经完成，可以关注到代码真正的部分了。与你需要控制的BLE的主要任务就是扫描和连接远端设备、通信和执行任何必要的管理或者安全任务。
+现在初始化和清理已经完成，我们可以专注于代码的真正核心。你需要处理的与 BLE 相关的主要任务是扫描和连接到远程设备、通信数据以及执行任何必要的管理或安全任务。
 
-当初始化一个扫描过程（参见第二章[广播和扫描](./chapter2.md#广播和扫描)），你可以让BLE库知道，你希望被通知到任何其从远端设备接收到的广播包。无论何时设备被找寻到，BleWrapper都会带着该设备信息去调用uiDeviceFound()回调函数。你可以使用设备信息来决定是否连接该设备。
+当启动扫描过程时（见第二章[广播和扫描](./chapter2.md#广播和扫描)），你让 BLE 库知道你想收到它从远程设备收到的任何广播数据包的通知。每当找到设备时，BleWrapper 都会调用 uiDeviceFound() 回调函数，并带有有关设备的信息。你可以使用设备信息来决定它是否是你想要连接的设备。
 
-对于扫描，你需要创建两个按键：第一个开启扫描，第二个停止。要创建这个按键，你需要到项目 /res/menu 目录中并编辑main.xml文件。如果你双击该文件，Eclipse会用GUI界面来引导你使用去增加菜单项。任何在main.xml文件的菜单项都将作为一个按键在选项菜单中存在。你将创建两个项，一个称为开始，一个称为结束，各自用于开始和结束扫描。
+对于扫描，你需要创建两个按钮：第一个开始扫描，第二个停止扫描。要创建按钮，你需要进入项目的 /res/menu 目录并编辑 main.xml 文件。如果你双击该文件，Eclipse 将带你进入一个 GUI 界面，你可以使用它来添加菜单项。main.xml 文件中的任何菜单项最终都会成为选项菜单中的按钮。你将创建两个项，一个称为 Start，一个称为 Stop，分别用于开始和停止扫描。
 
-在安卓菜单GUI中，选择增加→项目，并使用“扫描动作”（action_scan）和“扫描结束”（ac
-tion_stop）作为名字，如图8-7。这将作为按键的ID，当你为菜单按键写入点击处理的时候，你可以使用该ID。在菜单项的标题区域，各自敲击扫描（Scan）和停止（Stop），以在菜单项上显示文字。
+在 Android 菜单 GUI 中，选择添加→项，并使用 action_scan 和 action_stop 作为名称，如图 8-7 所示。这些将是你为菜单按钮编写点击处理程序时可以使用的按钮 ID。在菜单项的标题字段中，分别输入 Scan 和 Stop，以提供显示在菜单项中的文本。
 
 ![figure8-7](./pic/figure8-7.png)
 
-*图8-7. 在安卓ADT菜单中增加按键*
+*图 8-7. 在 Android ADT 菜单屏幕中添加按钮*
 
-一旦菜单项创建，你将需要处理按键点击事件。默认下，安卓样例代码会使用在*main.xml*中的内容作为菜单按键。样例代码没有点击处理，因此你需要增加进来。
+创建菜单项后，你需要处理按钮点击事件。默认情况下，Android 样板代码将使用 main.xml 中的任何项作为选项菜单按钮。但样板代码没有点击处理程序，因此你需要添加它。
 
-在Eclipse中，如果敲击onOptionsItemSelected并按下Ctrl+Spacebar，软件回自动填充该函数，包含了@Override的关键字。这将为点击事件实现自有的处理而复写onOptionsItemSelected()函数。当点击菜单栏的任何项，onOptionsItemSelected()方法都将被调用。一旦你进入该方法，你需要有一个switch声明用于处理哪一个菜单项被点击的事件。虚拟代码看起来如下：
+在 Eclipse 中，如果你输入 onOptionsItemSelected 并按 Ctrl+Spacebar，它应该自动完成函数，包括 @Override 关键字。你将覆盖 onOptionsItemSelected() 方法来实现自己的点击事件处理程序。当菜单中的任何项发生点击时，onOptionsItemSelected() 方法会被调用。进入方法后，你需要有一个 switch 语句来根据点击的菜单项处理事件。伪代码如下所示：
 
 ```java
 @Override
 public boolean onOptionsItemSelected(MenuItem item) {
     switch (item.getItemId())
     {
-        case R.id.action_scan:
-            mBleWrapper.startScanning();
-            break;
-        case R.id.action_stop:
-            mBleWrapper.stopScanning();
-            break;
-        default:
-            break;
+    case R.id.action_scan:
+        mBleWrapper.startScanning();
+        break;
+    case R.id.action_stop:
+        mBleWrapper.stopScanning();
+        break;
+    default:
+        break;
     }
     return super.onOptionsItemSelected(item);
 }
 ```
 
-该代码覆写了OptionsItemSelected()函数以使用自有的处理。该方法仅在处理关于选项菜单的时候方才调用。在switch声明中，可以根据被点击的按键选项ID来决定进入哪一个处理。该项ID基于之前你创建的按键的ID。R.id这个前缀意味着来自内部安卓项目资源目录的ID，并不是安卓自身命名空间的一部分。
+此代码覆盖 OptionsItemSelected() 函数以安装你自己的处理程序。此方法仅在处理与选项菜单相关的事件时调用。在 switch 语句中，你根据点击的按钮的项 ID 决定调用哪个处理程序。此项 ID 基于你之前创建的按钮的菜单项 ID。R.id 前缀意味着它是来自内部 Android 项目资源目录的 ID，而不是更广泛的 android 命名空间的一部分。
 
-在新的处理的两个动作中，获将开启扫描流程，或将停止，正如你在BleWrapper中看到的两个方法一样。实际上，开启和停止扫描流程可能是整个按键功能中最简单的一个部分。
+新处理程序中的两个操作将启动扫描或停止扫描过程，正如你在 BleWrapper 的两个方法中看到的那样。实际上，启动和停止扫描过程可能是整个设置中最容易实现按钮功能的部分。
 
-下一个步骤是当远端设备被检测到的动作。远端设备将发出“它在这儿”和“准备连接”的广播。当程序进入扫描模式，其将在BLE无线模块中开启扫描，并让安卓系统知道如果接受到广播其希望被通知到。安卓蓝牙库将通过回调函数通知程序。
+下一步是检测到远程设备时要采取的操作。远程设备将广播它在那里并准备好连接。当程序进入扫描模式时，它会在 BLE 射频中打开扫描，并让 Android 系统知道如果收到任何广播它想被告知。Android 蓝牙库将通过回调通知程序。
 
-为了使用回调函数，你需要重新看下在onCreate()方法内写的代码。在该方法内，你初始化了BleWrapper.。在BleWrapper.的构建函数内，其希望你提供一列回调函数。之前在这边留空了，但是现在需要填充该部分内容。首先要覆写uiDeviceFound()回调函数，这函数将在设备在扫描过程中被发现的时候被调用：
+为了使用回调，你将重新查看在 onCreate() 方法中编写的代码。在该方法中，你初始化了 BleWrapper。在 BleWrapper 的构造函数中，它期望你提供回调列表。你之前将其留空，但现在你将开始实现回调。第一个将覆盖 uiDeviceFound() 回调，当在扫描期间找到设备时，库将调用该回调：
 
-``` java
+```java
 mBleWrapper = new BleWrapper(this, new BleWrapperUiCallbacks.Null()
-{
-    @Override
-    public void uiDeviceFound(final BluetoothDevice device,
-    final int rssi,
-    final byte[] record
-    )
     {
-        String msg = "uiDeviceFound: "+device.getName()+", "+rssi+","+rssi.toString();
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
-        Log.d("DEBUG", "uiDeviceFound: " + msg);
+        @Override
+        public void uiDeviceFound(final BluetoothDevice device,
+                                  final int rssi,
+                                  final byte[] record)
+        {
+            String msg = "uiDeviceFound: "+device.getName()+", "+rssi+",
+                         "+rssi.toString();
+            Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+            Log.d("DEBUG", "uiDeviceFound: " + msg);
+        }
     }
-}
 ```
 
-当发现一个设备的时候，这段代码将弹出一个toast消息窗。这并没有什么有效，但是是最简单的一种方式，当设备被发现并显示关于设备的信息。在真实用户使用中，你将输出任何设备的信息到设备列表中，这样用户就可以点击去初始化一个连接。
+每当找到设备时，此代码都会发布一个 toast 消息框。这不是很实用，但它是指示何时找到设备并显示有关设备信息的简单方法。在实际用例中，你会将找到的任何设备输出到设备列表，人们可以点击该列表以启动连接。
 
-toast弹出信息显示两个来自广播包的内容：设备名字（参见第三章[广播数据格式](./chapter3.md#广播数据格式)）和RSSI。RSSI（代表*信号强度指标* 的一个无线术语）是表示接收的信号（在这情况下为，在广播包内所有比特的平均值）有多强。在一些情况下，RSSI可以用作提供一个大致的距离数据。另一条重要的有用的信息大概就是设备地址（这个在每一个广播包内都包含），但目前单独设备名字也足够了。
+toast 消息显示来自广播数据包的两条信息：设备名称（见第三章[广播数据格式](./chapter3.md#广播数据格式)）和 RSSI。RSSI（无线术语，代表接收信号强度指示器）是一种指示接收信号强度（在这种情况下是广播数据包中包含的所有位的平均值）的方法。在某些情况下，RSSI 可用于给出距离的粗略近似。
 
-代码不仅在toast消息窗输出相同的信息，也通过Log命令输出日志信息，Log时一个安卓库。在Eclipse IDE使用logcat工具调试中，Log信息会进行显示（见图8-8）。当你使用Log命令，你可以指定一个标签（tag）。使用这个很棒的工具，你可以用标签过滤掉大量的信息。
+另一条可能有用的关键信息是设备地址（包含在每个广播数据包中），但现在设备名称就足够了。
+
+代码不仅将相同的信息输出到 toast 消息框，还通过 Log 命令记录它，这是 Android 库。Log 消息在使用 logcat 工具调试期间显示在 Eclipse IDE 中（如图 8-8 所示）。当你使用 Log 命令时，你还指定一个标签。好处是你可以过滤标签以删除无关信息。
 
 ![figure8-8](./pic/figure8-8.png)
 
-*图8-8. 来自Log命令的消息在完整的logcat堆放的信息高亮显示*
+*图 8-8. 来自 Log 命令的消息在完整的 logcat 信息转储中高亮显示*
 
-目前，代码应该有能力去验证检测一个远端设备发送广播包。一旦有能力做这些事情，就有能力去连接。通常，应该要保存所有检测到的设备并以列表的形式显示给用户，如第三章[连接建立流程](./chapter3.md#连接建立流程)。用户就可以点击他试图连接的设备。为了避免GUI的复杂性，我们通过做假设来简化用例。
+到目前为止，代码应该已经能够验证它可以检测到发送广播数据包的远程设备。一旦能够做到这一点，它就需要能够连接到它。通常，你会保存所有检测到的设备并以列表形式显示给用户，如第三章[连接建立过程](./chapter3.md#连接建立过程)中所述。然后用户将能够点击她想要连接的设备。为了避免 GUI 复杂性，我们将通过做一些假设来简化用例。
 
-我们假设希望连接到一个SensorTag设备。以下代码使用“SensorTag”检测广播包，并用自动初始化任何用这名字的设备：
+我们假设我们想要连接到 SensorTag 设备。以下代码检查设备名称为"SensorTag"的广播数据包，并自动向具有该名称的任何设备发起连接请求：
 
-``` java
+```java
 @Override
 public void uiDeviceFound(final BluetoothDevice device,
-                            final int rssi,
-                            final byte[] record)
+                          final int rssi,
+                          final byte[] record)
 {
     String msg = "uiDeviceFound: "+device.getName()+", "+rssi+", "+ \
-    rssi.toString();
+        rssi.toString();
     Log.d("DEBUG", "uiDeviceFound: " + msg);
     if (device.getName().equals("SensorTag") == true)
     {
@@ -290,29 +288,29 @@ public void uiDeviceFound(final BluetoothDevice device,
         status = mBleWrapper.connect(device.getAddress().toString());
         if (status == false)
         {
-        	Log.d("DEBUG", "uiDeviceFound: Connection problem");
+            Log.d("DEBUG", "uiDeviceFound: Connection problem");
         }
     }
 }
 ```
 
-自动连接进程避免进入安卓复杂的GUI，只关注在我们从事的BLE库上面。
+这种自动连接过程避免了一些 Android GUI 复杂性，让我们专注于我们正在使用的 BLE 库。
 
-之前给uiDeviceFound()的回调函数代码已经去掉了弹出消息框。在找到一个和“SensorTag”名字相同的设备之后，代码回让BleWrapper连接设备，并以字符串格式传入设备地址（在第二章[蓝牙设备地址](./chapter2.md#蓝牙设备地址)介绍）。BleWrapper回使用地址向设备发送一个单播连接请求。接着当连接成功后，会通过uiDeviceConnected()回调函数进行提示。
+前面的 uiDeviceFound() 回调代码已被修改以删除弹出消息框。找到名称等于"SensorTag"的设备后，代码指示 BleWrapper 连接到设备并以字符串格式传入设备的地址（在第二章[蓝牙设备地址](./chapter2.md#蓝牙设备地址)中介绍）。BleWrapper 将使用地址向设备发送单播连接请求。然后，如果连接成功，它将通过 uiDeviceConnected() 回调通知你。
 
-你将需要覆写回调函数，增加处理代码。如果连接因为某种原因失败，该方法会返回失败。你可以使用logcat控制台去进行日志记录来进行调试。
+你将需要覆盖此回调并添加处理程序代码。如果由于某种原因连接不成功，方法调用的状态将返回 false。你可以使用它向 logcat 控制台记录消息以进行调试。
 
-## 与远端设备进行通信
+## 与远程设备通信
 
-一旦你成功连接一个远端设备，BleWrapper将自动为新的设备开启发现服务（如第四章[服务与特征发现](./chapter4.md#服务与特征发现)描述）。这意味着BleWrapper将要求新的设备列出所有的服务和特征，并保存在列表中。
+一旦你成功连接到远程设备，BleWrapper 将自动为新设备启动服务发现（如第四章[服务和特征发现](./chapter4.md#服务和特征发现)中所述）。这意味着它将请求新设备列出设备上的所有服务和特征并将它们存储在列表中。
 
-如果连接到GATT服务端和服务发现成功了，其他回调函数就开始了。这回，uiAvailableServices()的回调函数和其中一个列出所有的蓝牙GATT服务的服务列表（service list）（更多关于服务和特征信息请参见第四章[服务](./chapter4.md#服务)）这个参数在远端设备就可以使用了。为了与设备进行通信，我们需要进入服务以及在服务内的特征。
+如果与 GATT 服务器的连接和服务发现成功，则会发出另一个回调。这次，回调是 uiAvailableServices()，其中一个参数是服务列表，列出了远程设备上可用的所有蓝牙 GATT 服务（有关服务和特征的更多信息，请参见第四章[服务](./chapter4.md#服务)）。为了与设备通信，我们需要访问服务，然后访问服务内部的特征。
 
-这时候，可以循环列表并将所有的服务打印出来，但是这是不易读的格式。服务通过128bitUUID列出（参见第四章[UUID](./chapter4.md#UUID)）。早期时候从蓝牙应用加速器妇之的库包含了一个称为BleNamesResolver的类。这个类有很多方法可以将UUID解析为BLE的名字。其可以解析包括服务和特征的名字，因此这个库是相当有用的。
+此时，你可以循环遍历列表并打印出服务，但它们不是人类可读的格式。服务都按 128 位 UUID 列出（见第四章[UUID](./chapter4.md#uuid)）。你之前从蓝牙应用加速器复制过来的类库文件包含一个名为 BleNamesResolver 的类。这个类有各种方法将 UUID 解析为 BLE 名称。它可以解析服务和特征，所以这个库非常有用。
 
-已知的UUID列表位域BleDefinedUUIDs.java文件中，你之后需要增加一些合适的服务的UUID进该列表中。目前，仅遍历该服务列表并打印出所有的服务UUID，就可以转化出可读的名字和相关信息（对于目前logcat来说）。下面代码是另一个覆写的回调函数，并在onCreate方法中走到，并在mBleWrapper的构造函数中：
+已知 UUID 的列表位于 BleDefinedUUIDs.java 文件中，稍后你需要向其中添加一些专有服务 UUID。现在，与其简单地滚动服务列表并打印出服务 UUID，不如将它们解析为人类可读的名称并打印出来（目前仅用于 logcat）。代码是另一个回调覆盖，放在 onCreate 方法中，在 mBleWrapper 构造函数内部：
 
-``` java
+```java
 @Override
 public void uiAvailableServices(BluetoothGatt gatt,
                                 BluetoothDevice device,
@@ -321,33 +319,33 @@ public void uiAvailableServices(BluetoothGatt gatt,
     for (BluetoothGattService service : services)
     {
         String serviceName = BleNamesResolver.resolveUuid
-        (service.getUuid().\toString());
+            (service.getUuid().toString());
         Log.d("DEBUG", serviceName);
     }
 }
 ```
 
-该代码遍历了每一个服务列表中的元素。对于每一个服务，其将UUID转换为一个字符串值并传给BleNamesResolverBleNamesResolver.resolveUuid()方法。该方法查找已知的UUID列表，当找到一个匹配的UUID，就返回相关的可读的UUID名字。代码将通过logcat打印出名字到Eclipse IDE中。正如图8-9所示。这也可以导出信息到文本框中，但是这就稍微麻烦了点。
+此代码循环遍历服务列表中的每个元素。对于每个服务，它然后将 UUID 转换为字符串值并将其传入 BleNamesResolver.resolveUuid() 方法。此方法遍历已知 UUID 列表，当找到 UUID 的匹配项时，返回关联的人类可读 UUID 名称。它将名称打印到 Eclipse IDE 中的 logcat，如图 8-9 所示。也可以将它们直接转储到文本框中以供查看，但这稍微复杂一点。
 
 ![figure8-9](./pic/figure8-9.png)
 
-*图8-9. Eclipse中，logcat显示了服务和特征*
+*图 8-9. Eclipse 中 logcat 显示服务和特征*
 
-可以看到，有一些UUID是未知的。这通常意味着含有厂家指定的128bit UUID，如果需要解析清楚，就需要将其加入UUID列表中。在这个例子中，TI给自己的设备使用一些厂家指定的服务UUID，因为这部分不需要适配到一个标准的设备配置文件中。这是一个很大的UUID地址空间，因此在处理不同BLE地址时候，可能会遇到很多厂家指定的UUID。你需要增加TI厂家制定UUID到列表中并重新运行这段程序。
+你会注意到一些 UUID 是未知的。这通常意味着存在供应商特定的 128 位 UUID，如果你想正确解析它们，你需要将它们添加到 UUID 列表中。在这种情况下，TI 为其设备使用一些供应商特定的服务 UUID，因为它不适合标准设备配置文件。UUID 地址空间很大，因此在使用不同的 BLE 设备时，你很可能会遇到许多供应商特定的 UUID。你需要将 TI 供应商特定的 UUID 添加到列表中，然后再次运行代码。
 
-目前，你走完BLE应用的大部分开发过程，并可以运行。你已经检测了远端设备，连接并打印了其可用的所有服务。下一步是读取关联设备传感器的特征值（在第四章[特征](./chapter4.md#特征)介绍）。
+到目前为止，你已经完成了让 BLE 应用启动和运行的大部分工作。你已经检测到远程设备、连接到它并打印了它可用的服务。下一步是读取与其传感器关联的特征值（在第四章[特征](./chapter4.md#特征)中介绍）。
 
-属于传感器的特征值携带了传感器的数据，因此通过读取可获得传感器数据。一旦从传感器获取了数据，你可以进行整理并处理这些数据，并用吸引人的方式来显示给用户。在这例子中，我们将关注于获取数据，并让用户决定如何处理、展示。
+属于传感器的特征携带传感器数据，因此通过读取这些数据，你可以获取传感器数据。一旦你从传感器获取了数据，就只是格式化和处理数据，然后以吸引人的方式呈现给用户的问题。在这种情况下，我们将专注于获取数据，让用户决定如何处理和呈现它。
 
-当使用SensorTag时候有一个需要注意的是这是一个移动设备。设备被设计为低功耗，因此传感器默认是关闭的。为了读取每一个传感器，你需要写入特征值去开启。一旦传感器可以使用，你就可以读取数据。
+使用 SensorTag 时需要注意的一件事是它是一个移动设备。它被设计为低功耗，因此传感器默认情况下是关闭的。要读取每个传感器，你必须写入特征以打开它。一旦传感器启用，你就可以从中读取数据。
 
-正如第四章[特征](./chapter4.md#特征)讨论的，所有与用户数据相关联的操作都通过特征执行。为了开启一个传感器，首先要找到包含相符合的特征的服务和其特征（参见第四章[服务和特征发现](./chapter4.md#服务和特征发现)），然后接收其数值（参见第四章[读取特征和描述符](./chapter4.md#读取特征和描述符)）。接着你需要修改特征值以开启传感器，并用合理的方式写入到设备，这参见第四章[写入特征和描述符](./chapter4.md#写入特征和描述符)。这称作一个*读取-修改-写入*流程。
+如第四章[特征](./chapter4.md#特征)中所述，所有与用户数据相关的操作实际上都通过特征执行。要启用传感器，你首先需要找到包含相应特征的服务和特征本身（见第四章[服务和特征发现](./chapter4.md#服务和特征发现)），然后检索其值（如第四章[读取特征和描述符](./chapter4.md#读取特征和描述符)中所述）。然后你需要修改特征值为启用传感器的值，然后以第四章[写入特征和描述符](./chapter4.md#写入特征和描述符)中描述的方式将其写回设备。这称为读取-修改-写入操作。
 
-现在已经连接了外围设备，并有BluetoothGatt对象可以使用。为了获得服务，你需要使用gatt对象内的一个叫做getService()的方法。这个带有一个UUID的参数，这意味着你将要提供一个指定的服务UUID。这些事所有TI指定的UUID，但是幸运的是，TI在SensorTag源码中以Java格式提供了完整的服务列表和特征的UUID。
+你已经连接到外围设备并拥有 BluetoothGatt 对象。要检索服务，你将使用 gatt 对象中名为 getService() 的方法。它接受 UUID 参数，这意味着你必须提供特定的服务 UUID。这些都是 TI 特定的 UUID，但幸运的是，TI 在其 SensorTag 源代码中以 Java 源代码格式提供了服务和特征 UUID 的完整列表。
 
-你可以复制粘贴完整的UUID列表到你的源代码中，并让其称为常量。以下为一个这应该展现的样子的例子：
+你想将完整的 UUID 列表复制并粘贴到你的源代码中，并使它们成为应用中的常量。以下是它应该看起来的示例：
 
-``` java
+```java
 private static final UUID
     UUID_IRT_SERV = fromString("f000aa00-0451-4000-b000-000000000000"),
     UUID_IRT_DATA = fromString("f000aa01-0451-4000-b000-000000000000"),
@@ -359,15 +357,15 @@ private static final UUID
 ...
 ```
 
-服务UUID有SERV的后缀。否则其他的UUID就是特征。一旦你有了这个定义，你可以写入代码去访问指定的传感器服务和特征。
+服务 UUID 带有 SERV 后缀。否则，其他 UUID 是特征。一旦你定义了这些，你就可以编写代码来访问特定传感器的服务和特征。
 
-与远端设备通信不像读取一个特征以及有一个方法返回值那样简单。你实际是需要发送给设备ATT读写请求，GATT服务端接着会回应请求（更近一步概念请见第二章[ATT操作](./chpater2.md#ATT操作)）。在同一时间仅有一个请求会被处理，此时其他接收的请求将被静默丢弃。这看起来似乎很糟糕，因为似乎像设备没有回应。
+与远程设备通信并不像读取特征并让方法返回值那么简单。你实际上需要向设备发送 ATT 读取和写入请求，然后 GATT 服务器将向请求发送响应（这些概念在第二章[ATT 操作](./chapter2.md#att-操作)中进一步解释）。一次只能处理一个请求，在处理请求时传入的任何其他请求都会被静默丢弃。这可能是一个令人沮丧的来源，因为它看起来就像设备没有响应。
 
-正确的操作顺序是发送一个请求，并等待对应的回调函数。你将发送一个读请求到远端设备去读取一个指定的特征。在设备回应之后，BleWrapper将带着特征信息发出一个回调函数给uiNewValueForCharacteristic。通过如此，你可以执行*读取特征值* 的GATT特征，详细在第四章[读取特征和描述符](./chapter4.md#读取特征和描述符)提到。
+正确的操作顺序是发送请求并等待适当的回调。例如，你将向远程设备发送读取请求以读取特定特征。设备响应后，BleWrapper 将向 uiNewValueForCharacteristic 发出回调，并带有特征信息。通过这样做，你正在实现第四章[读取特征和描述符](./chapter4.md#读取特征和描述符)中解释的读取特征值 GATT 功能。
 
-下面这段代码请求了读取一个加速度传感器的配置特征：
+此代码请求读取加速度计的配置特征：
 
-``` java
+```java
 BluetoothGatt gatt;
 BluetoothGattCharacteristic c;
 gatt = mBleWrapper.getGatt();
@@ -375,9 +373,9 @@ c = gatt.getService(UUID_ACC_SERV).getCharacteristic(UUID_ACC_CONF);
 mBleWrapper.requestCharacteristicValue(c);
 ```
 
-一旦请求发出，设备就会带着特征数据回应。在这个例子中，你将导出特征原始数据的每一个字节到logcat中：
+发出请求后，设备将使用特征的数据进行响应。在这种情况下，你将把特征原始值的每个字节转储到 logcat：
 
-``` java
+```java
 @Override
 public void uiNewValueForCharacteristic(BluetoothGatt gatt,
                                         BluetoothDevice device,
@@ -388,112 +386,109 @@ public void uiNewValueForCharacteristic(BluetoothGatt gatt,
                                         byte[] rawValue,
                                         String timestamp)
 {
-    super.uiNewValueForCharacteristic( gatt, device, service,
-    ch, strValue, intValue,
-    rawValue, timestamp);
+    super.uiNewValueForCharacteristic(gatt, device, service,
+                                    ch, strValue, intValue,
+                                    rawValue, timestamp);
     Log.d(LOGTAG, "uiNewValueForCharacteristic");
     for (byte b:rawValue)
     {
-    	Log.d(LOGTAG, "Val: " + b);
+        Log.d(LOGTAG, "Val: " + b);
     }
 }
 ```
 
-很重要一点是，读、写都必须进行请求。在安卓BLE库中有很多函数可以得到和设置特征值。这些操作仅在本地保存的数值上，不能再远端设备。在大多情况下，任何与远端设备交互都将需要使用回调函数。
+重要的是要记住，每次读取或写入都必须请求。Android 的 BLE 库中有获取和设置特征值的函数。这些仅对本地存储的值进行操作，而不是对远程设备进行操作。在大多数情况下，与远程设备的任何交互都需要使用回调。
 
-在你读取传感器的任何数值之前，你先要开启传感器。因此你先要写入配置特征值（传感器都有自有的特征来开启，不要与CCCD相混淆）。在大多数情况下，你可以写入0x01到特征中开启。如之前提到的，你实际发送一个写请求（*写入特征值* 请见第四章[写入特征和描述符](./chapter4.md#写入特征和描述符)，操作列表在第二章[ATT操作](./chapter2.md#ATT操作)）给端设备，并等待回调函数。
+在读取传感器的任何数据之前，你首先需要启用它们。为此，你必须向其配置特征写入值（这些是启用传感器的专有特征，不要与 CCCD 混淆）。在大多数情况下，你只需向此特征写入 0x01 即可启用它们。如前所述，你实际上向对等设备发送写入请求（第四章[写入特征和描述符](./chapter4.md#写入特征和描述符)中的写入特征值，操作列在第二章[ATT 操作](./chapter2.md#att-操作)中），然后等待回调。
 
-下面这段代码通过在远端设备写入0x01到加速度传感器配置特征中，开启了加速度传感器：
+此代码通过向远程设备上的加速度计配置特征写入 0x01 来启用加速度计：
 
-``` java
+```java
 BluetoothGattCharacteristic c;
 c = gatt.getService(UUID_ACC_SERV).getCharacteristic(UUID_ACC_CONF);
 mBleWrapper.writeDataToCharacteristic(c, new byte[] {0x01});
-mState = ACC_ENABLE; // keep state context for callback
+mState = ACC_ENABLE;    // keep state context for callback
 ```
 
-如之前一样，你需要等待回调函数来确认是否写入操作成功。对于代码在哪里等待这个事情发生的问题，最好就是使用单独一个现成或者一个状态机来确定。一个单独的线程可以在线程阻塞时等待回调函数而不需要耽搁系统继续运行。状态机则可以在相同的线程中维持，并保持跟踪当前的context以执行操作。
+和以前一样，你需要等待回调以知道写入操作是否成功。在你必须等待事情发生的情况下，最好使用单独的线程或状态机。单独的线程将允许你在等待回调时阻塞线程，而不会占用系统的其余部分。状态机允许你保持在同一个线程中，并跟踪正在执行的操作的当前上下文。
 
-对于一个写操作，应用加速器已经有两个很有用的回调函数：
+对于写入操作，应用加速器有两个有用的回调：
 
-``` java
+```java
 @Override
-public void uiSuccessfulWrite( BluetoothGatt gatt,
-                                BluetoothDevice device,
-                                BluetoothGattService service,
-                                BluetoothGattCharacteristic ch,
-                                String description)
+public void uiSuccessfulWrite(BluetoothGatt gatt,
+                              BluetoothDevice device,
+                              BluetoothGattService service,
+                              BluetoothGattCharacteristic ch,
+                              String description)
 {
     BluetoothGattCharacteristic c;
     super.uiSuccessfulWrite(gatt, device, service, ch, description);
     switch (mState)
     {
-        case ACC_ENABLE:
+    case ACC_ENABLE:
         Log.d(LOGTAG, "uiSuccessfulWrite: Successfully enabled accelerometer");
         break;
     }
 }
-      
+
 @Override
-public void uiFailedWrite( BluetoothGatt gatt,
-                            BluetoothDevice device,
-                            BluetoothGattService service,
-                            BluetoothGattCharacteristic ch,
-                            String description)
+public void uiFailedWrite(BluetoothGatt gatt,
+                          BluetoothDevice device,
+                          BluetoothGattService service,
+                          BluetoothGattCharacteristic ch,
+                          String description)
 {
-	super.uiFailedWrite(gatt, device, service, ch, description);
+    super.uiFailedWrite(gatt, device, service, ch, description);
     switch (mState)
     {
-        case ACC_ENABLE:
+    case ACC_ENABLE:
         Log.d(LOGTAG, "uiFailedWrite: Failed to enable accelerometer");
         break;
     }
 }
 ```
 
-为了开启所有的传感器，你可以直接拓展这个例子来开启所有的传感器。在执行写入操作开启第一个传感器后，你可以开启在回调函数中其他的传感器：
+要启用所有传感器，你基本上将启用一个传感器的情况扩展到所有传感器。在启用第一个传感器的写入操作之后，你将在回调中启用其他每个传感器：
 
-``` java
+```java
 @Override
-public void uiSuccessfulWrite( BluetoothGatt gatt,
-                                BluetoothDevice device,
-                                BluetoothGattService service,
-                                BluetoothGattCharacteristic ch,
-                                String description)
+public void uiSuccessfulWrite(BluetoothGatt gatt,
+                              BluetoothDevice device,
+                              BluetoothGattService service,
+                              BluetoothGattCharacteristic ch,
+                              String description)
 {
     BluetoothGattCharacteristic c;
     super.uiSuccessfulWrite(gatt, device, service, ch, description);
     switch (mState)
     {
-        case ACC_ENABLE:
+    case ACC_ENABLE:
         Log.d(LOGTAG, "uiSuccessfulWrite: Successfully enabled accelerometer");
-
         // enable next sensor
         c = gatt.getService(UUID_IRT_SERV).getCharacteristic(UUID_IRT_CONF);
         mBleWrapper.writeDataToCharacteristic(c, new byte[] {0x01});
-        mState = IRT_ENABLE; // keep state context for callback
+        mState = IRT_ENABLE;    // keep state context for callback
         break;
-            
-        case IRT_ENABLE:
+    case IRT_ENABLE:
         Log.d(LOGTAG, "uiSuccessfulWrite: Successfully enabled IR temp sensor");
         // enable next sensor
         c = gatt.getService(UUID_HUM_SERV).getCharacteristic(UUID_HUM_CONF);
         mBleWrapper.writeDataToCharacteristic(c, new byte[] {0x01});
-        mState = HUM_ENABLE; // keep state context for callback
+        mState = HUM_ENABLE;    // keep state context for callback
         break;
-
-        case HUM_ENABLE:
+    case HUM_ENABLE:
         ....
         mState = MAG_ENABLE;
         break;
-        ...
+    ...
     }
 }
 ```
 
-一旦传感器开启后，就可以读取传感器。手动读取，你将发送一个读请求到你想要读取的特征中，并在回调函数中进行等待（参见第二章[ATT操作](./chpater2.md#ATT操作)和第四章[读取特征和描述符](./chapter4.md#读取特征和描述符)）。读取可以由一个事件发动，如按键或者一个时钟轮询传感器。在这个例子中，在选项菜单的一个测试按键发动事件。按键的onClick方法调用以下函数来产生一个读请求：
+一旦传感器启用，就可以读取传感器。要手动读取传感器，你将向你想要读取的特征发出读取请求，并在回调中等待响应（有关更多详细信息，请参见第二章[ATT 操作](./chapter2.md#att-操作)和第四章[读取特征和描述符](./chapter4.md#读取特征和描述符)）。读取可以由事件触发，例如按下按钮或定期轮询传感器的定时器。在这种情况下，选项菜单中创建的测试按钮触发事件。该按钮的 onClick 方法调用以下函数来生成读取请求：
 
-``` java
+```java
 // Start the read request
 private void testButton()
 {
@@ -502,7 +497,6 @@ private void testButton()
     if (!mBleWrapper.isConnected()) {
         return;
     }
-    
     Log.d(LOGTAG, "testButton: Reading acc");
     gatt = mBleWrapper.getGatt();
     c = gatt.getService(UUID_ACC_SERV).getCharacteristic(UUID_ACC_DATA);
@@ -521,101 +515,96 @@ public void uiNewValueForCharacteristic(BluetoothGatt gatt,
                                         byte[] rawValue,
                                         String timestamp)
 {
-    super.uiNewValueForCharacteristic( gatt, device, service,
-                                        ch, strValue, intValue,
-                                        rawValue, timestamp);
-    
+    super.uiNewValueForCharacteristic(gatt, device, service,
+                                    ch, strValue, intValue,
+                                    rawValue, timestamp);
     // decode current read operation
     switch (mState)
     {
-        case (ACC_READ):
+    case (ACC_READ):
         Log.d(LOGTAG, "uiNewValueForCharacteristic: Accelerometer data:");
         break;
     }
-    
     // dump data byte array
     for (byte b:rawValue)
     {
-    	Log.d(LOGTAG, "Val: " + b);
+        Log.d(LOGTAG, "Val: " + b);
     }
 }
 ```
 
-一旦传感器数据被请求，就需要进行一系列步骤来处理数据。数据处理每一个传感器的代码可以在SensorTag安卓库的例子中或者在[SensorTag在线使用指南](http://bit.ly/1kQHyTq)找到。
+一旦获取了传感器的数据，仍然需要一些步骤来处理数据。每个传感器的数据处理代码可以在 SensorTag 示例 Android 库或 [SensorTag 在线用户指南](http://bit.ly/1kQHyTq) 中找到。
 
-你可以复制/粘贴加速度传感器的处理算法到之前代码段中，通常在代码的ACC_READ状态部分。其他传感器也是如此。
+你可以将加速度计的处理算法复制/粘贴到前面的代码片段中，通常在解码器的 ACC_READ 状态部分。所有其他传感器的数据处理也是如此。
 
-轮询远端传感器是周期获取数据的一种方式，但却对于两端设备都不是节能的。远端设备需要持续保持接收读请求，手机需要保持唤醒去发送轮询请求。一个更节能的方式就是用设备发送通知取代（在第四章[服务初始化更新](./chapter4.md#服务初始化更新)详细描述）。你可以手动设置一些传感器通知的周期。
+轮询远程传感器是定期从中提取数据的一种方式，但对两个设备来说都不是节能的。远程设备需要保持开启以捕获读取请求，手机需要保持唤醒以发送轮询请求。更有效的方法是让设备发送通知（在第四章[服务器发起的更新](./chapter4.md#服务器发起的更新)中详细描述）。你可以为某些传感器手动设置通知周期。
 
-应用加速器有一个专门的方法来开启通知。在安卓上开启通知，你通常要为你感兴趣的特定特征开启局部通知。
+应用加速器有一个特殊的方法来启用通知。要在 Android 上启用通知，你通常需要为你感兴趣的特定特征在本地启用通知。
 
-一旦完成这事，你还需要通过写入设备的客户端特征配置描述符（CCCD）在开启远端设备开启通知，如第四章[客户端特征配置描述符](./chapter4.md#客户端特征配置描述符)描述）。幸运的是，这都已经被抽取了出来，两个操作过程都可以通过一个单独的方法调用来处理。
+完成后，你还必须通过写入设备的客户端特征配置描述符（CCCD）在对等设备上启用通知，如第四章[客户端特征配置描述符](./chapter4.md#客户端特征配置描述符)中所述。幸运的是，这被抽象出来了，两个操作都可以通过单个方法调用来处理。
 
-当测试按键被按下，下面的代码即为加速度传感器开启了通知：
+以下代码在按下测试按钮时为加速度计启用通知：
 
-``` java
+```java
 private void testButton()
 {
     BluetoothGatt gatt;
     BluetoothGattCharacteristic c;
     if (!mBleWrapper.isConnected()) {
-    	return;
+        return;
     }
-    
     // set notification on characteristic
     Log.d(LOGTAG, "Setting notification");
     gatt = mBleWrapper.getGatt();
     c = gatt.getService(UUID_IRT_SERV).getCharacteristic(UUID_IRT_DATA);
     mBleWrapper.setNotificationForCharacteristic(c, true);
-    mState = ACC_NOTIFy_ENB;
+    mState = ACC_NOTIFY_ENB;
 }
 ```
 
-有一点要注意的是，这里没有执行onDescriptorWrite()回调函数。去得知通知在远端设备被成功开启的时间的最可靠的方式，就是在CCCD已经被修改以及GATT服务器已经应答了写请求之后，去获取onDescriptorWrite()回调函数。这里的范例增加了onDescriptorWrite()回调函数到BleWrapper类中的应用加速器中执行，这里执行了BluetoothGattCallback代码：
+应用加速器中需要注意的一个问题是它没有实现 Android 蓝牙库中可用的 onDescriptorWrite() 回调。了解通知是否已在对等设备上成功启用的最可靠方法是在 CCCD 被修改且 GATT 服务器确认写入操作后获取 onDescriptorWrite() 回调。此示例在 BleWrapper 类中向应用加速器的此实现添加了 onDescriptorWrite() 回调，其中它实现了 BluetoothGattCallback 代码：
 
-``` java
+```java
 /* callbacks called for any action on particular Ble Device */
 private final BluetoothGattCallback mBleCallback = new BluetoothGattCallback()
 {
     ...
-        
     // Added by Akiba
     @Override
-    public void onDescriptorWrite( BluetoothGatt gatt,
-                                    BluetoothGattDescriptor descriptor,
-                                    int status)
+    public void onDescriptorWrite(BluetoothGatt gatt,
+                                  BluetoothGattDescriptor descriptor,
+                                  int status)
     {
         String deviceName = gatt.getDevice().getName();
-        String serviceName = BleNamesResolver.resolveServiceName( \
-            descriptor.getCharacteristic().getService().getUuid().\
+        String serviceName = BleNamesResolver.resolveServiceName(
+            descriptor.getCharacteristic().getService().getUuid().
             toString().toLowerCase(Locale.getDefault()));
-        String charName = BleNamesResolver.resolveCharacteristicName(\
-            descriptor.getCharacteristic().getUuid().toString().\
+        String charName = BleNamesResolver.resolveCharacteristicName(
+            descriptor.getCharacteristic().getUuid().toString().
             toLowerCase(Locale.getDefault()));
-        String description = "Device: " + deviceName + " Service: " \
-        	+ serviceName + " Characteristic: " + charName;
-        
+        String description = "Device: " + deviceName + " Service: "
+            + serviceName + " Characteristic: " + charName;
         // we got response regarding our request to write new value to
         // the characteristic, let's see if it failed or not
         if(status == BluetoothGatt.GATT_SUCCESS) {
-            mUiCallback.uiSuccessfulWrite( mBluetoothGatt, mBluetoothDevice,
-                                            mBluetoothSelectedService,
-                                            descriptor.getCharacteristic(),
-                                            description);
+            mUiCallback.uiSuccessfulWrite(mBluetoothGatt, mBluetoothDevice,
+                                    mBluetoothSelectedService,
+                                    descriptor.getCharacteristic(),
+                                    description);
         }
         else {
-            mUiCallback.uiFailedWrite( mBluetoothGatt, mBluetoothDevice,
-                                        mBluetoothSelectedService,
-                                        descriptor.getCharacteristic(),
-                                        description + " STATUS = " + status);
+            mUiCallback.uiFailedWrite(mBluetoothGatt, mBluetoothDevice,
+                                mBluetoothSelectedService,
+                                descriptor.getCharacteristic(),
+                                description + " STATUS = " + status);
         }
-    };
+    }
     ...
 }
 ```
 
-如果通知被正确写入，onDescriptorWrite()方法将调用应用加速器的uiSuccessfulWrite()方法。
+如果通知已正确写入，onDescriptorWrite() 方法将调用应用加速器的 uiSuccessfulWrite() 方法。
 
-你可以用你开启自身传感器一样的方式为所有的传感器特征开启通知，使用一个状态机来排成队列一一处理。对于通知，要始终知道对于安卓4.4（KitKat），只有4个特征可以在同一时间被开启。这是当前安卓BLE库的一个限制，尽管可能在未来的版本中被改变。
+你可以通过与启用传感器本身相同的方式为所有传感器特征启用通知，使用状态机按顺序处理一个又一个。对于通知，请记住，对于 Android 4.4（KitKat），一次只能启用四个特征的通知。这是当前 Android BLE 库实现的限制，尽管它可能会在未来版本中更改。
 
-本章的代码大多以片段方式呈现，你可以从本书[GitHub库](http://bit.ly/1qoj8Ed)中获取到完整的代码。
+本章中的代码大部分以片段形式呈现，但你可以从本书的 [GitHub 仓库](http://bit.ly/1qoj8Ed) 获取完整的源代码。

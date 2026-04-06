@@ -1,89 +1,91 @@
-# 第六章，调试工具
+# 第六章 调试工具
 
-本章介绍了用于BLE的一些有用的调试和开发工具。这包含了硬件工具，如无线协议分析工具（wireless protocol analyzers）或者*嗅探器*（sniffers，嗅探空中的传输数据，将获取到的数据现实在一个UI上并之后进行分析），还有在调试期间与BLE从设备直接交互的工具。
+本章介绍了一些用于蓝牙低功耗的有用调试和开发工具。它包括硬件工具，如无线协议分析器或嗅探器（这些工具嗅探空中传输的数据，在 UI 中显示捕获的数据以供后续分析），以及在调试过程中直接与 BLE 外围设备交互的工具。
 
-## PCA10000 USB Dongle和Master Control Panel
+为了让小型初创企业或刚开始接触 BLE 的工程师和开发人员也能使用，本章重点关注廉价工具，而不是价格高达数千或数万美元的高端产品。
 
-PCA10000是一个USB电子狗，是诺迪克半导体的nRF51822-EK套件的一部分（参见第五章[用nRF51822-EK工作](./chapter5.md#用nRF51822-EK工作)），这个是nRF51822片上系统（SoC）的一个低成本评估套件。当这个套件被正在设计自有的BLE从设备的嵌入式硬件工程师设计时，即使你只开发手机应用，购买该套件也会比较划算，因为套件包含了许多非常有用和价格合理的调试工具。
+## PCA10000 USB 加密狗和 Master Control Panel
 
-Master Control Panel (MCP)是其中的一个调试工具，这是一个Windows界面的程序，可以将PCA10000 USB Dongle模拟成为一个BLE中心设备。该工具的有一个易操作的界面，你可以看到范围内任何BLE从设备的数据，或者给任何你已连接的从设备发送数据。这在没有包含BLE本地支持的Windows 7上也非常适用（Windows 8上支持BLE，但操作系统没有包含一个用于测试和调试的类似应用）。
+PCA10000 是一个 USB 加密狗，包含在 Nordic Semiconductor 的 nRF51822-EK（第五章[使用 nRF51822-EK](./chapter5.md#使用-nrf51822-ek)）中，这是 nRF51822 片上系统（SoC）的低成本评估套件。虽然该套件是为设计自己的 BLE 外围设备的嵌入式硬件工程师设计的，但即使你只开发移动应用，购买该套件也是值得的，因为它以相对适中的价格包含了许多极其有用的调试工具。
 
-![figure-bird](D:/work/myCash/book/Getting Started with Bluetooth Low Energy in Chinese/pic/figure-bird.png)诺迪克也给Android提供了一个主控平台（Master Control Panel）应用，包含了一些相同的功能却不需要任何硬件的需求，虽然截止目前，适用PCA10000的独立工具支持大量工具集。
+这些工具之一是 Master Control Panel（MCP），这是一个基于 Windows 的实用程序，可以将 PCA10000 USB 加密狗变成可以模拟 BLE 中心设备的工具。它具有易于使用的界面，允许你查看范围内 BLE 外围设备上可用的任何数据，或向你连接的任何外围设备发送数据。这在 Windows 7 上特别有用，因为它不包含蓝牙低功耗的原生支持（Windows 8 引入了 BLE 支持，但该操作系统没有包含用于测试和调试的类似应用）。
 
-如果你在编写一个现有从设备的应用程序，你也可以使用MCP去逆向还原BLE设备，显示设备自有数据结构和配置设置信息，然后在你的手机应用中使用发现服务和特征UUID来访问它们。
+> 注意：Nordic 还为 Android 提供了 Master Control Panel 应用，包含一些相同的功能，无需任何额外的硬件要求，尽管在撰写本文时，使用 PCA10000 的独立工具支持更大的命令集。
 
-MCP使用一个制定的包含了工具安装包的固件镜像来和PCA10000交流。使用诺迪克的nRFGo Studio（在诺迪克的网站注册你的nRF51822-EK套件后即可看到使用，第五章[例子和工具链](./chapter5.md#例子和工具链)有相关信息），你可以更新USB dongle来使用该固件镜像。
+如果你正在为现有的外围设备编写应用，你还可以使用 MCP 快速逆向工程 BLE 配件，显示它们各自的数据结构和配置设置，然后使用发现的服务和特征 UUID 在移动应用中访问它们。
 
-一旦PCA10000已经升级成合适的固件，你可以打开MCP与从设备通过一个简单的UI交互进行交流，这可以几乎完成一个普通中心设备的任何功能。其包含了绑定、打开或者关闭一个连接，读写GATT特征等。
+MCP 使用工具安装程序中包含的特殊固件镜像与 PCA10000 通信。使用 Nordic 的 nRFGo Studio（在 Nordic 网站注册你的 nRF51822-EK 后也可用，见第五章[示例和工具链](./chapter5.md#示例和工具链)中的说明），你可以更新 USB 加密狗以使用此固件镜像。
 
-图6-1展示了一个单独的从设备广播自己的结果。
+一旦 PCA10000 已更新为适当的固件，你可以打开 MCP 并通过易于导航的 UI 与你的外围设备交互，这允许你执行正常中心设备的几乎任何功能。这包括绑定、打开或关闭连接、读写 GATT 特征等。
 
-一旦你连接从设备，并发送一个服务发现请求，你就会看到设备上一组服务和特征（见图6-2），同样你也可以用这样的方式读取任意常规BLE中心设备。
+图 6-1 显示了单个外围设备广播自身的结果。
 
-你可以通过选择一个合适的特征进行更新值，在文本编辑框馁修改数值，并点击“发送更新”。你也可以通过选择特征并点击读取键来获取最新的特征值，对于特征的通知和指示都未使能的情况下，这是非常有用的。
+![figure6-1](./pic/figure6-1.png)
 
-![图6-1](./pic/figure6-1.png)
+*图 6-1. Master Control Panel 显示广播数据*
 
-*图6-1. 主控制面板（MCP）显示广播数据*
+一旦你连接到外围设备并发送服务发现请求，你可以看到设备上可用的服务和特征列表（如图 6-2 所示），此时你可以像使用任何常规 BLE 中心设备一样读取或写入它们。
 
-在早期硬件开发过程中，MCP是一个极其脆弱的工具，当你可能没有一个手机应用给你BLE从设备进行交流的时候。主控制面板可以模拟几乎任何你的应用执行的动作，包括校验通信中进出的数据。
-
-MCP也包括了一组C#库，被用于自动提供其任意的功能，允许应用开发者创建一个拥有简单但完整的一组中心设备的API的桌面应用或者命令行应用。这对于这对于自动化复原测试或者产品测试可以说是非常有用的。
+你可以通过选择适当的特征、在值文本框中修改值，然后点击"发送更新"来更新值。你还可以通过选择任何特征并点击读取按钮来检索其最新值，这对于尚未启用通知或指示的特征很有用。
 
 ![figure6-2](./pic/figure6-2.png)
 
-*图6-2. 主控制面板展示服务和特征数据*
+*图 6-2. Master Control Panel 显示服务和特征数据*
 
-## PCA10000 USB Dongle和Wireshark
+MCP 在硬件开发过程早期是一个极其有价值的工具，那时你可能还没有移动应用与你的 BLE 外围设备通信。Master Control Panel 可以模拟你的应用将执行的几乎任何操作，包括验证传入和传出数据的通信。
 
-前文的主控制面板（Master Control Panel）似乎是与BLE从设备交互最简单的方式，但是一些用例需求访问BLE的底层数据。对于这些情况，诺迪克也提供给给PCA10000或者PCA10001一个通用的固件镜像和工具（这两个都包含在nRF51822-EK开发套件内），可以从一个单独的从设备嗅探通信数据并推送到[Wireshark](http://www.wireshark.org/)内。
+MCP 还包括一组 C# 库，可用于自动化它提供的任何功能，允许应用开发人员创建桌面或命令行应用，这些应用可以访问简单但完整的中心 API 集。这对于自动化回归测试或生产测试非常有用。
 
-Wireshark是一个成熟而功能强大的开源数据获取和分析的软件，该软件可以将包和字节级别的数据轻松可视化。诺迪克的Wireshark插件（见图6-3，可在[诺迪克官网](http://www.nordicsemi.com/)注册nRF51822-EK套件后使用）通过nRF51822-EK开发板获取数据，并增加有用的描述帮助理解这些原始的数据。
+## PCA10000 USB 加密狗和 Wireshark
+
+Master Control Panel（[PCA10000 USB 加密狗和 Master Control Panel](#pca10000-usb-加密狗和-master-control-panel)）可能是与 BLE 外围设备交互的最简单方式，但某些用例需要更低级别地访问 BLE 数据。对于这些情况，Nordic 还为 PCA10000 或 PCA10001（两者都包含在其 nRF51822-EK 开发套件中）提供了自定义固件镜像和工具，可以从单个外围设备嗅探流量并将其推送到 Wireshark。
+
+Wireshark 是一个成熟且强大的开源数据捕获和分析工具，允许你轻松地将数据可视化到数据包和字节级别。Nordic 的 Wireshark 插件（如图 6-3 所示，在 Nordic 支持网站注册你的 nRF51822-EK 套件后可用），通过 nRF51822-EK 板捕获数据，并添加有用的描述以帮助理解这些原始数据。
 
 ![figure6-3](./pic/figure6-3.png)
 
-*图6-3. 诺迪克半导体的PCA10000在Wireshark插件的数据*
+*图 6-3. Nordic Semiconductor 的 PCA10000 与 Wireshark 插件*
 
-如果你仅对设计与已有的BLE从设备通信的应用感兴趣，你将几乎不需要到达底下这一层。但是对于从事从设备设计、编码或者尝试调试一个制定的时延、吞吐量的硬件设计师或者固件工程师来说，这个就非常的实用。
+如果你只对设计与现有 BLE 外围设备通信的应用感兴趣，你几乎不需要深入到这个级别。但这对从事自己的外围设备设计和代码的硬件设计师或固件工程师，或尝试调试特定时延或吞吐量问题的人来说，这可能非常有用。
 
-## CC2540 USB Dongle和SmartRF Sniffer
+## CC2540 USB 加密狗和 SmartRF Sniffer
 
-作为围绕CC254x芯片家族的开发生态系统的一部分，德州仪器设计了[CC2540EMK-USB](http://www.ti.com/tool/cc2540emk-usb)（图6-4），一个低成本的以CC2540芯片的USB dongle，可以使用它们免费的[SmartRF软件](http://www.ti.com/tool/packet-sniffer)（图6-5）来将开发板转换为一个BLE的嗅探器。这结合让你在最低等级上，可以看到你周围所有无线传输的BLE数据。
+作为其 CC254x 系列 IC 开发生态系统的一部分，德州仪器设计了 CC2540EMK-USB（图 6-4），这是一个基于 CC2540 的低成本 USB 加密狗，可以与其免费的 SmartRF 软件（图 6-5）一起使用，将板子转换为 BLE 嗅探器。这种组合允许你在最低级别查看周围空中传输的所有 BLE 数据。
 
 ![figure6-4](./pic/figure6-4.png)
 
-*图6-4. CC2540EMK-USB*
+*图 6-4. CC2540EMK-USB*
 
-这完成了一个于PCA10000/Wireshark结合相似的功能（见前文）,但是其提供了一个不同的UI，更易于在一种特定的情境之下工作。该套件可能在一些地区更易于获取。
-
-## SmartRF-to-Wireshark Converter
-
-如果你更喜欢Wireshark（见前文[PCA10000 USB Dongle和Wireshark](PCA10000 USB Dongle和Wireshark))）作为数据分析工具，并且能够使用CC2540 USB dongle（见前文[CC2540 USB Dongle和SmartRF Sniffer](#CC2540 USB Dongle和SmartRF Sniffer)），你会很高兴发现[smartRFtoPcap](https://github.com/mikeryan/smartRFtoPcap)，这是一个免费的工具，可以将保存的SmartRF数据转换为一个Wireshark可以理解的文件格式。
-
-你不需要使用PCA10000和诺迪克的Wireshark插件将在线数据流导入Wireshark，而是可以选择转化之前获取的可能依然有用的文件，因为Wireshark包含了大量的过滤、搜索你记录的数据的工具。
+这执行了与 PCA10000/Wireshark 组合（[PCA10000 USB 加密狗和 Wireshark](#pca10000-usb-加密狗和-wireshark)）类似的功能，但它提供了不同的 UI，在某些情况下可能更容易使用。在某些地区，这些套件可能更容易采购。
 
 ![figure6-5](./pic/figure6-5.png)
 
-*图6-5. 德州仪器的SmartRF Sniffer应用*
+*图 6-5. 德州仪器的 SmartRF Sniffer 应用*
 
-## Bluez hcitool和gatttool
+### SmartRF 到 Wireshark 转换器
 
-如果你正在使用一个Linux工作站，你可以利用Bluez蓝牙协议栈中的两个有用的工具：hcitool和gattool，这可以从命令行与BLE设备进行交互。
+如果你更喜欢 Wireshark（[PCA10000 USB 加密狗和 Wireshark](#pca10000-usb-加密狗和-wireshark)）作为数据分析工具，并且可以使用 CC2540 USB 加密狗（[CC2540 USB 加密狗和 SmartRF Sniffer](#cc2540-usb-加密狗和-smartrf-sniffer)），你会很高兴发现 smartRFtoPcap，这是一个免费可用的工具，可以将保存的 SmartRF 数据转换为 Wireshark 可以理解的文件格式。
 
-![bird](./pic/figure-bird.png) *如果你不能使用一个专业的Linux工作站，Bluez也可以很好地运行在一个不昂贵的Linux设备上，比如树莓派或者BeagleBone Black，这两都可以转变为非常有用且移动方便的BLE调试工具。*
+你将无法像使用 PCA10000 和 Nordic 的 Wireshark 插件那样将实时数据流式传输到 Wireshark，但能够转换之前捕获的文件可能仍然很有用，因为 Wireshark 包含许多实用程序来过滤和搜索你记录的数据。
 
-hcitool可以扫描、连接范围内的BLE从设备，或者视需要，使用任何可支持BLE4.0的USB dongle模拟为一个BLE设备。为了扫描范围内的BLE设备，你可以执行下列命令（假设我们的USB dongle已经作为hci0）：
+## Bluez hcitool 和 gatttool
+
+如果你使用的是 Linux 工作站，你可以利用 Bluez 蓝牙协议栈中的两个有用实用程序，hcitool 和 gatttool，它们允许你从命令行与 BLE 设备交互。
+
+> 注意：如果你无法使用专用的 Linux 工作站，Bluez 也可以在廉价的 Linux 设备（如 Raspberry Pi 或 BeagleBone Black）上正常运行，这将它们变成极其有用且便携的 BLE 调试工具。
+
+hcitool 允许你扫描范围内的 BLE 外围设备、连接到它们，或使用任何受支持的 BLE 4.0 USB 加密狗可选地模拟 BLE 设备。要扫描范围内的 BLE 设备，你可以发出以下命令（假设我们的 USB 加密狗枚举为 hci0）：
 
 ```shell
 sudo hcitool -i hci0 lescan
 ```
 
-一旦你有了设备地址（通过之前扫描命令获取而得），你可以使用下列命令进行连接从设备（假设从设备的地址为6C:60:B3:6E:7C:B1）：
+一旦你有了设备的地址（通过先前的扫描命令检索），你可以使用以下命令连接到外围设备（假设外围设备地址为 6C:60:B3:6E:7C:B1）：
 
 ```shell
 sudo hcitool lecc 6C:60:B3:6E:7C:B1
 ```
 
-gatttool可以与GATT服务交互，如读写设备特征值。
+gatttool 允许你与 GATT 服务交互，例如读取或写入设备上的特征。
 
-这些内容都可以使用命令行操作，意味着你可以将一些特定重复的动作或者测试条件写成脚本，并在多终硬件设备上可靠而持续地运行这些相同的测验。
+能够从命令行执行此操作意味着你可以轻松地为某些重复操作或测试用例编写脚本，并在多个硬件设备上一致且可靠地运行相同的测试。
