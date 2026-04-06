@@ -50,6 +50,18 @@
 - 可能带来歧义或技术交流中更常用英文的词，保留中英文对照，如时序（timing）、连接（connections）
 - 公司名称保留原文，如 Nordic Semiconductor
 
+## 版权声明
+
+本翻译基于 O'Reilly Media 出版的《Getting Started with Bluetooth Low Energy》一书，
+**未经原作者或出版社授权**，仅供个人学习和技术研究使用。
+
+- 📖 原书购买：[O'Reilly](https://www.oreilly.com/library/view/getting-started-with/9781491900550/) / [Amazon](https://www.amazon.com/dp/1491900563/)
+- 📧 如涉及版权问题，请通过 [GitHub Issue](https://github.com/Eronwu/Getting-Started-with-Bluetooth-Low-Energy-in-Chinese/issues) 联系，我将及时处理
+- 💡 如果您从事 BLE 相关开发，强烈建议购买正版原书支持作者
+
+### 增订版（第 11-12 章）
+增订版内容为本人收集整理，欢迎转载分享，请注明出处，请勿用于商业目的。
+
 ---
 
 **本书已翻译完成。若文章内容和翻译有不正确之处，恳请提 issue 指正，感谢！也欢迎一起讨论蓝牙技术 📡**
